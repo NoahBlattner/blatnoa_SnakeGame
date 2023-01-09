@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.concurrent.TimeUnit;
 
+// TODO Move tick to a parent class TickObject
 public class PhysicsMarble {
 
     final float bounciness = 0.45f;
@@ -24,6 +25,11 @@ public class PhysicsMarble {
     double xSpeed = 0;
     double ySpeed = 0;
 
+    /**
+     * Constructor for the physics marble
+     * @param activity The activity in witch the marble is placed
+     * @param viewToBind The image view to use as marble
+     */
     public PhysicsMarble(Activity activity, ImageView viewToBind) {
         this.activity = activity;
         binding = viewToBind;
