@@ -67,9 +67,12 @@ public class PhysicsMarble {
      * Pushes the tick object to the tick object stack
      */
     private void pushToTickObjectStack() {
-        boolean additionSuccesfull = TickManager.getTickManager().addTickObject(this);
-        if (!additionSuccesfull) {
+        boolean additionSuccessful = TickManager.getTickManager().addTickObject(this);
+        if (!additionSuccessful) {
             Toast.makeText(activity, "Cannot add anymore physics objects", Toast.LENGTH_SHORT).show();
+            binding.setVisibility(ImageView.INVISIBLE);
+        } else {
+            binding.setVisibility(ImageView.VISIBLE);
         }
     }
 

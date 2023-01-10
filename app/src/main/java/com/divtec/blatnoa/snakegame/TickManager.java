@@ -27,7 +27,7 @@ public class TickManager implements Runnable {
      */
     public static TickManager getTickManager() {
         if (instance == null) {
-            TickManager tickManager = new TickManager();
+            new TickManager();
             return instance;
         }
 
@@ -39,7 +39,7 @@ public class TickManager implements Runnable {
      * @return True if a tick object can be added, false otherwise
      */
     public boolean canAddTickObject() {
-        return tickObjects.size() >= MAX_TICK_OBJECTS;
+        return tickObjects.size() < MAX_TICK_OBJECTS;
     }
 
     /**

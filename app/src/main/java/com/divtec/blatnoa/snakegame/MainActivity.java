@@ -112,12 +112,14 @@ public class MainActivity extends AppCompatActivity {
      * Add a new marble to the activity
      */
     private void addNewMarble() {
-        ImageView newView = createNewMarbleView();
+        if (TickManager.getTickManager().canAddTickObject()) {
+            ImageView newView = createNewMarbleView();
 
-        lyt.addView(newView);
+            lyt.addView(newView);
 
-        PhysicsMarble newMarble = new PhysicsMarble(this, newView);
-        additionalPhysicMarbles.add(newMarble);
+            PhysicsMarble newMarble = new PhysicsMarble(this, newView);
+            additionalPhysicMarbles.add(newMarble);
+        }
     }
 
     // TODO Create a custom component
