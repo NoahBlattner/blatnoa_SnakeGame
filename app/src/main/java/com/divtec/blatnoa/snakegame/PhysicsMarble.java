@@ -1,6 +1,12 @@
 package com.divtec.blatnoa.snakegame;
 
 import android.app.Activity;
+import android.graphics.Point;
+import android.graphics.PointF;
+import android.hardware.display.DisplayManager;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowMetrics;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -9,7 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import java.util.concurrent.TimeUnit;
 
 // TODO Move tick to a parent class TickObject
-public class PhysicsMarble {
+public class PhysicsMarble implements Tickable {
 
     private final float bounciness = 0.45f;
 
@@ -32,6 +38,10 @@ public class PhysicsMarble {
      * @param viewToBind The image view to use as marble
      */
     public PhysicsMarble(Activity activity, ImageView viewToBind) {
+        if (!TickManager.getTickManager().canAddTickObject()) {
+            throw new StackLimitReachedException();
+        }
+
         this.activity = activity;
         binding = viewToBind;
 
@@ -49,6 +59,10 @@ public class PhysicsMarble {
      * @param useRandomStartPosition Whether to use a random start position or start at the center
      */
     public PhysicsMarble(Activity activity, ImageView viewToBind, boolean useRandomStartPosition) {
+        if (!TickManager.getTickManager().canAddTickObject()) {
+            throw new StackLimitReachedException();
+        }
+
         this.activity = activity;
         binding = viewToBind;
 
@@ -67,13 +81,7 @@ public class PhysicsMarble {
      * Pushes the tick object to the tick object stack
      */
     private void pushToTickObjectStack() {
-        boolean additionSuccessful = TickManager.getTickManager().addTickObject(this);
-        if (!additionSuccessful) {
-            Toast.makeText(activity, "Cannot add anymore physics objects", Toast.LENGTH_SHORT).show();
-            binding.setVisibility(ImageView.INVISIBLE);
-        } else {
-            binding.setVisibility(ImageView.VISIBLE);
-        }
+        TickManager.getTickManager().addTickObject(this);
     }
 
     /**
@@ -101,6 +109,8 @@ public class PhysicsMarble {
      */
     private void moveMarble(long deltaTime) {
 
+        PointF screenSize = getPhysicalScreenSizeCM();
+
         // Using delta time and acceleration, calculate new position
         float newXPosition = (float) (xPosition + xSpeed / 100 * (deltaTime / 1000f));
         float newYPosition = (float) (yPosition + ySpeed / 100 * (deltaTime / 1000f));
@@ -108,7 +118,7 @@ public class PhysicsMarble {
         if (newXPosition < 0) { // If marble has reached left bound
             // Correct position and bounce marble
             newXPosition = 0;
-            xSpeed *= -bounciness;
+             xSpeed *= -bounciness;
         } else if (newXPosition > 1) { // If marble has reached right bound
             // Correct position and bounce marble
             newXPosition = 1;
@@ -126,6 +136,21 @@ public class PhysicsMarble {
         }
 
         setPositions(newXPosition, newYPosition);
+    }
+
+    private PointF getPhysicalScreenSizeCM() {
+        PointF screenSize = new PointF();
+
+        // Get screen size in cm
+        DisplayMetrics metrics = activity.getBaseContext().getResources().getDisplayMetrics();
+        float pixelWidth = metrics.widthPixels;
+        float pixelHeight = metrics.heightPixels;
+        pixelWidth /= metrics.xdpi;
+        pixelHeight /= metrics.ydpi;
+        screenSize.x = pixelWidth * 2.54f;
+        screenSize.y = pixelHeight * 2.54f;
+
+        return screenSize;
     }
 
     /**
@@ -153,6 +178,7 @@ public class PhysicsMarble {
      * Run all the physics calculations
      * @param deltaTime The time since the last tick
      */
+    @Override
     public void tick(long deltaTime) {
         addAccelerationValues(deltaTime);
         moveMarble(deltaTime);

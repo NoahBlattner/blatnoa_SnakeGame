@@ -9,7 +9,7 @@ public class TickManager implements Runnable {
 
     private static TickManager instance;
 
-    private ArrayList<PhysicsMarble> tickObjects = new ArrayList<>();
+    private ArrayList<Tickable> tickObjects = new ArrayList<>();
 
     long lastTime;
     boolean running;
@@ -45,14 +45,13 @@ public class TickManager implements Runnable {
     /**
      * Adds a tick object to the tick object stack
      * @param newTickObject The tick object to push to the stack
-     * @return True if the object was added to the stack, false otherwise
      */
-    public boolean addTickObject(PhysicsMarble newTickObject) {
+    public void addTickObject(Tickable newTickObject) {
         if (canAddTickObject()) {
             tickObjects.add(newTickObject);
-            return true;
+        } else {
+            throw new StackLimitReachedException();
         }
-        return false;
     }
 
     /**
@@ -83,7 +82,7 @@ public class TickManager implements Runnable {
             long currentTime = System.currentTimeMillis();
             long deltaMS = currentTime - lastTime;
 
-            for (PhysicsMarble current : tickObjects) {
+            for (Tickable current : tickObjects) {
                 current.tick(deltaMS);
             }
 
