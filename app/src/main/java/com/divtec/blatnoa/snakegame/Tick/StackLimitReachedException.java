@@ -1,4 +1,4 @@
-package com.divtec.blatnoa.snakegame;
+package com.divtec.blatnoa.snakegame.Tick;
 
 public class StackLimitReachedException extends RuntimeException {
     public StackLimitReachedException( ) {

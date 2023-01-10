@@ -15,6 +15,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.divtec.blatnoa.snakegame.Physics.Collider;
+import com.divtec.blatnoa.snakegame.Physics.PhysicsMarble;
+import com.divtec.blatnoa.snakegame.Tick.TickManager;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ConstraintLayout lyt;
     private ImageView mainMarble;
+    private ImageView square;
     private Button addButton;
 
     private TickManager tickManager;
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         // Get components
         lyt = findViewById(R.id.layout);
         mainMarble = findViewById(R.id.marble);
+        square = findViewById(R.id.centerSquare);
         addButton = findViewById(R.id.addButton);
 
         // Create tick manager
@@ -55,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Create the physics of the main marble
         mainPhysics = new PhysicsMarble(this, mainMarble, false);
+
+        // Create the collision of the center square
+        new Collider(square);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
         sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 
         tickManager.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        tickManager.stop();
     }
 
     /**

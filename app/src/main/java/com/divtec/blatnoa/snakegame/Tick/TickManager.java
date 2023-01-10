@@ -1,4 +1,4 @@
-package com.divtec.blatnoa.snakegame;
+package com.divtec.blatnoa.snakegame.Tick;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -58,6 +58,10 @@ public class TickManager implements Runnable {
      * Starts the tick thread
      */
     public void start() {
+        if (running) {
+            throw new TickThreadAlreadyRunningException();
+        }
+
         lastTime = System.currentTimeMillis();
 
         running = true;

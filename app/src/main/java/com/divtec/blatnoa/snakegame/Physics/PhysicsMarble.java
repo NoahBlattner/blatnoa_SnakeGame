@@ -1,4 +1,4 @@
-package com.divtec.blatnoa.snakegame;
+package com.divtec.blatnoa.snakegame.Physics;
 
 import android.app.Activity;
 import android.graphics.PointF;
@@ -7,12 +7,15 @@ import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-public class PhysicsMarble implements Tickable {
+import com.divtec.blatnoa.snakegame.Tick.StackLimitReachedException;
+import com.divtec.blatnoa.snakegame.Tick.TickManager;
+import com.divtec.blatnoa.snakegame.Tick.Tickable;
+
+public class PhysicsMarble extends Collider implements Tickable {
 
     private final float bounciness = 0.45f;
 
     private Activity activity;
-    private ImageView viewBinding;
     private ConstraintLayout.LayoutParams params;
 
     private float xPosition = .5f;
@@ -30,13 +33,9 @@ public class PhysicsMarble implements Tickable {
      * @param viewToBind The image view to use as marble
      */
     public PhysicsMarble(Activity activity, ImageView viewToBind) {
-
-        if (!TickManager.getTickManager().canAddTickObject()) {
-            throw new StackLimitReachedException();
-        }
+        super(viewToBind);
 
         this.activity = activity;
-        viewBinding = viewToBind;
 
         params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
 
@@ -52,12 +51,9 @@ public class PhysicsMarble implements Tickable {
      * @param useRandomStartPosition Whether to use a random start position or start at the center
      */
     public PhysicsMarble(Activity activity, ImageView viewToBind, boolean useRandomStartPosition) {
-        if (!TickManager.getTickManager().canAddTickObject()) {
-            throw new StackLimitReachedException();
-        }
+        super(viewToBind);
 
         this.activity = activity;
-        viewBinding = viewToBind;
 
         params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
 
@@ -110,25 +106,24 @@ public class PhysicsMarble implements Tickable {
         float newXPosition = (float) (xPosition + xBiasByCM * xSpeed * 10 * deltaTime / 1000f);
         float newYPosition = (float) (yPosition + yBiasByCM * ySpeed * 10 * deltaTime / 1000f);
 
-        double randBounceFlux = (Math.random() - .5) * 0.1f;
         if (newXPosition < 0) { // If marble has reached left bound
             // Correct position and bounce marble
             newXPosition = 0;
-             xSpeed *= -bounciness + randBounceFlux;
+            bounceX();
         } else if (newXPosition > 1) { // If marble has reached right bound
             // Correct position and bounce marble
             newXPosition = 1;
-            xSpeed *= -bounciness + randBounceFlux;
+            bounceX();
         }
 
         if (newYPosition < 0) { // If marble has reached lower bound
             // Correct position and bounce marble
             newYPosition = 0;
-            ySpeed *= -bounciness + randBounceFlux;
+            bounceY();
         } else if (newYPosition > 1) { // If marble has reached upper bound
             // Correct position and bounce marble
             newYPosition = 1;
-            ySpeed *= -bounciness + randBounceFlux;
+            bounceY();
         }
 
         setPositions(newXPosition, newYPosition);
@@ -170,12 +165,37 @@ public class PhysicsMarble implements Tickable {
 
     }
 
+    private void bounceX() {
+        double randBounceFlux = (Math.random() - .5) * 0.1f;
+        xSpeed *= -bounciness + randBounceFlux;
+    }
+
+    private void bounceY() {
+        double randBounceFlux = (Math.random() - .5) * 0.1f;
+        ySpeed *= -bounciness + randBounceFlux;
+    }
+
+    @Override
+    protected void colliding(Collider other) {
+        // Find where the collision happened
+        float xDistance = other.viewBinding.getX() - viewBinding.getX();
+        float yDistance = other.viewBinding.getY() - viewBinding.getY();
+
+        if (xDistance > 0) { // If the collision happened on the right, bounce the marble on the x axis
+            bounceX();
+        } else { // else bounce on the y axis
+            bounceY();
+        }
+        moveMarble(1);
+    }
+
     /**
      * Run all the physics calculations
      * @param deltaTime The time since the last tick
      */
     @Override
     public void tick(long deltaTime) {
+        super.tick(deltaTime);
         addAccelerationValues(deltaTime);
         moveMarble(deltaTime);
     }
