@@ -1,26 +1,18 @@
 package com.divtec.blatnoa.snakegame;
 
 import android.app.Activity;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.hardware.display.DisplayManager;
 import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.WindowMetrics;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import java.util.concurrent.TimeUnit;
-
-// TODO Move tick to a parent class TickObject
 public class PhysicsMarble implements Tickable {
 
     private final float bounciness = 0.45f;
 
     private Activity activity;
-    private ImageView binding;
+    private ImageView viewBinding;
     private ConstraintLayout.LayoutParams params;
 
     private float xPosition = .5f;
@@ -38,12 +30,13 @@ public class PhysicsMarble implements Tickable {
      * @param viewToBind The image view to use as marble
      */
     public PhysicsMarble(Activity activity, ImageView viewToBind) {
+
         if (!TickManager.getTickManager().canAddTickObject()) {
             throw new StackLimitReachedException();
         }
 
         this.activity = activity;
-        binding = viewToBind;
+        viewBinding = viewToBind;
 
         params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
 
@@ -64,7 +57,7 @@ public class PhysicsMarble implements Tickable {
         }
 
         this.activity = activity;
-        binding = viewToBind;
+        viewBinding = viewToBind;
 
         params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
 
@@ -109,30 +102,33 @@ public class PhysicsMarble implements Tickable {
      */
     private void moveMarble(long deltaTime) {
 
-        PointF screenSize = getPhysicalScreenSizeCM();
+        PointF screenSizeCM = getPhysicalScreenSizeCM();
+        float xBiasByCM = 1 / screenSizeCM.x;
+        float yBiasByCM = 1 / screenSizeCM.y;
 
         // Using delta time and acceleration, calculate new position
-        float newXPosition = (float) (xPosition + xSpeed / 100 * (deltaTime / 1000f));
-        float newYPosition = (float) (yPosition + ySpeed / 100 * (deltaTime / 1000f));
+        float newXPosition = (float) (xPosition + xBiasByCM * xSpeed * 10 * deltaTime / 1000f);
+        float newYPosition = (float) (yPosition + yBiasByCM * ySpeed * 10 * deltaTime / 1000f);
 
+        double randBounceFlux = (Math.random() - .5) * 0.1f;
         if (newXPosition < 0) { // If marble has reached left bound
             // Correct position and bounce marble
             newXPosition = 0;
-             xSpeed *= -bounciness;
+             xSpeed *= -bounciness + randBounceFlux;
         } else if (newXPosition > 1) { // If marble has reached right bound
             // Correct position and bounce marble
             newXPosition = 1;
-            xSpeed *= -bounciness;
+            xSpeed *= -bounciness + randBounceFlux;
         }
 
         if (newYPosition < 0) { // If marble has reached lower bound
             // Correct position and bounce marble
             newYPosition = 0;
-            ySpeed *= -bounciness;
+            ySpeed *= -bounciness + randBounceFlux;
         } else if (newYPosition > 1) { // If marble has reached upper bound
             // Correct position and bounce marble
             newYPosition = 1;
-            ySpeed *= -bounciness;
+            ySpeed *= -bounciness + randBounceFlux;
         }
 
         setPositions(newXPosition, newYPosition);
@@ -168,7 +164,7 @@ public class PhysicsMarble implements Tickable {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                binding.setLayoutParams(params);
+                viewBinding.setLayoutParams(params);
             }
         });
 

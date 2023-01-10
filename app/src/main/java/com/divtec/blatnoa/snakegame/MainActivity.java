@@ -13,12 +13,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int SENSOR_AVERAGE_VALUES = 5;
+    public static final int SENSOR_AVERAGE_VALUES = 2;
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         // Register the listener
-        sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 
         tickManager.start();
     }
@@ -119,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
 
             PhysicsMarble newMarble = new PhysicsMarble(this, newView);
             additionalPhysicMarbles.add(newMarble);
+        } else {
+            Toast.makeText(this, "Cannot add more marbles", Toast.LENGTH_SHORT).show();
         }
     }
 
