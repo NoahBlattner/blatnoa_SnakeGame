@@ -1,10 +1,12 @@
 package com.divtec.blatnoa.snakegame;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -15,6 +17,8 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final int SENSOR_AVERAGE_VALUES = 5;
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -45,9 +49,11 @@ public class MainActivity extends AppCompatActivity {
         mainMarble = findViewById(R.id.marble);
         addButton = findViewById(R.id.addButton);
 
+        // Create tick manager
         tickManager = TickManager.getTickManager();
 
-        mainPhysics = new PhysicsMarble(this, mainMarble);
+        // Create the physics of the main marble
+        mainPhysics = new PhysicsMarble(this, mainMarble, false);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,25 +70,15 @@ public class MainActivity extends AppCompatActivity {
         acceleroListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(android.hardware.SensorEvent event) {
-                
-                xReadings.add(event.values[0]);
-                yReadings.add(-event.values[1]);
-                if (xReadings.size() > 10) {
-                    xReadings.remove(0);
-                }
-                if (yReadings.size() > 10) {
-                    yReadings.remove(0);
-                }
+                // Add reading to readings list
+                addSensorReading(event);
 
+                // Get average values from 5 last readings to reduces jittering
                 double xReadingAvg = getArrayAverage(xReadings);
                 double yReadingAvg = getArrayAverage(yReadings);
 
-                mainPhysics.updateAccelerationValues(xReadingAvg, yReadingAvg);
-
-                for (PhysicsMarble current : additionalPhysicMarbles) {
-                    current.updateAccelerationValues(xReadingAvg, yReadingAvg);
-                }
-
+                // Set the values in the static var of the physics marble
+                PhysicsMarble.updateAccelerationValues(xReadingAvg, yReadingAvg);
             }
 
             @Override
@@ -97,10 +93,44 @@ public class MainActivity extends AppCompatActivity {
         tickManager.start();
     }
 
+    /**
+     * Add a new sensor reading value to both the x and y readings
+     * @param event The sensor event containing the readings
+     */
+    private void addSensorReading(SensorEvent event) {
+        xReadings.add(event.values[0]);
+        yReadings.add(-event.values[1]);
+        if (xReadings.size() > SENSOR_AVERAGE_VALUES) {
+            xReadings.remove(0);
+        }
+        if (yReadings.size() > SENSOR_AVERAGE_VALUES) {
+            yReadings.remove(0);
+        }
+    }
+
+    /**
+     * Add a new marble to the activity
+     */
     private void addNewMarble() {
+        ImageView newView = createNewMarbleView();
+
+        lyt.addView(newView);
+
+        PhysicsMarble newMarble = new PhysicsMarble(this, newView);
+        additionalPhysicMarbles.add(newMarble);
+    }
+
+    // TODO Create a custom component
+    /**
+     * Creates and sets up a new marble view
+     * @return The new marble view
+     */
+    @NonNull
+    private ImageView createNewMarbleView() {
         ImageView newView = new ImageView(this);
         ConstraintLayout.LayoutParams newParams = new ConstraintLayout.LayoutParams(20, 20);
 
+        // Set up constraints
         int id = lyt.getId();
         newParams.topToTop = id;
         newParams.bottomToBottom = id;
@@ -109,11 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
         newView.setLayoutParams(newParams);
         newView.setImageResource(R.drawable.marble);
-
-        lyt.addView(newView);
-
-        PhysicsMarble newMarbel = new PhysicsMarble(this, newView);
-        additionalPhysicMarbles.add(newMarbel);
+        return newView;
     }
 
     /**
@@ -130,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         for (float current : array) {
             sum += current;
         }
+
         return sum / array.size();
     }
 }

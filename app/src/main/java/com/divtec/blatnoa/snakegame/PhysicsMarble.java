@@ -2,6 +2,7 @@ package com.divtec.blatnoa.snakegame;
 
 import android.app.Activity;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -10,20 +11,20 @@ import java.util.concurrent.TimeUnit;
 // TODO Move tick to a parent class TickObject
 public class PhysicsMarble {
 
-    final float bounciness = 0.45f;
+    private final float bounciness = 0.45f;
 
-    Activity activity;
-    ImageView binding;
-    ConstraintLayout.LayoutParams params;
+    private Activity activity;
+    private ImageView binding;
+    private ConstraintLayout.LayoutParams params;
 
-    float xPosition = .5f;
-    float yPosition = .5f;
+    private float xPosition = .5f;
+    private float yPosition = .5f;
 
-    double lastXReading = 0;
-    double lastYReading = 0;
+    private static double lastXReading = 0;
+    private static double lastYReading = 0;
 
-    double xSpeed = 0;
-    double ySpeed = 0;
+    private double xSpeed = 0;
+    private double ySpeed = 0;
 
     /**
      * Constructor for the physics marble
@@ -38,19 +39,63 @@ public class PhysicsMarble {
 
         setPositions((float) Math.random(), (float) Math.random());
 
-        TickManager.getTickManager().addTickObject(this);
+        pushToTickObjectStack();
     }
 
-    public void updateAccelerationValues(Double xSpeed, Double ySpeed) {
-        lastXReading = xSpeed;
-        lastYReading = ySpeed;
+    /**
+     * Constructor for the PhysicsMarble
+     * @param activity The activity in witch the marble is placed
+     * @param viewToBind The image view to use as marble
+     * @param useRandomStartPosition Whether to use a random start position or start at the center
+     */
+    public PhysicsMarble(Activity activity, ImageView viewToBind, boolean useRandomStartPosition) {
+        this.activity = activity;
+        binding = viewToBind;
+
+        params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
+
+        if (useRandomStartPosition) {
+            setPositions((float) Math.random(), (float) Math.random());
+        } else {
+            setPositions(0.5f, 0.5f);
+        }
+
+        pushToTickObjectStack();
     }
 
-    private void addAccelerationValues() {
-        ySpeed += lastXReading;
-        xSpeed -= lastYReading;
+    /**
+     * Pushes the tick object to the tick object stack
+     */
+    private void pushToTickObjectStack() {
+        boolean additionSuccesfull = TickManager.getTickManager().addTickObject(this);
+        if (!additionSuccesfull) {
+            Toast.makeText(activity, "Cannot add anymore physics objects", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    /**
+     * Updates the accelerometer values
+     * @param xAcceleration The current x acceleration
+     * @param yAcceleration
+     */
+    public static void updateAccelerationValues(Double xAcceleration, Double yAcceleration) {
+        lastXReading = xAcceleration;
+        lastYReading = yAcceleration;
+    }
+
+    /**
+     * Updates the acceleration values with the last sensor readings
+     */
+    private void addAccelerationValues(long deltaTime) {
+        // IMPORTANT -> X and Y are inverted due to landscape mode
+        ySpeed += lastXReading * deltaTime / 1000;
+        xSpeed -= lastYReading * deltaTime / 1000;
+    }
+
+    /**
+     * Move the marble to a new position according to it's speed
+     * @param deltaTime The time since the last update
+     */
     private void moveMarble(long deltaTime) {
 
         // Using delta time and acceleration, calculate new position
@@ -80,6 +125,11 @@ public class PhysicsMarble {
         setPositions(newXPosition, newYPosition);
     }
 
+    /**
+     * Update the position of the marble
+     * @param newXPosition The new x position
+     * @param newYPosition The new y position
+     */
     private void setPositions(float newXPosition, float newYPosition) {
         xPosition = newXPosition;
         yPosition = newYPosition;
@@ -96,8 +146,12 @@ public class PhysicsMarble {
 
     }
 
+    /**
+     * Run all the physics calculations
+     * @param deltaTime The time since the last tick
+     */
     public void tick(long deltaTime) {
-        addAccelerationValues();
+        addAccelerationValues(deltaTime);
         moveMarble(deltaTime);
     }
 }

@@ -14,7 +14,9 @@ public class TickManager implements Runnable {
     long lastTime;
     boolean running;
 
-    // Private constructor to allow singleton
+    /**
+     * Private constructor to allow singleton
+     */
     private TickManager() {
         instance = this;
     }
