@@ -3,26 +3,28 @@ package com.divtec.blatnoa.snakegame.Physics;
 import android.graphics.Rect;
 import android.widget.ImageView;
 
+import com.divtec.blatnoa.snakegame.Tick.TickManager;
 import com.divtec.blatnoa.snakegame.Tick.Tickable;
 
 import java.util.ArrayList;
 
 public class Collider implements Tickable {
 
-    private static ArrayList<Collider> colliders = new ArrayList<>();
+    private static final ArrayList<Collider> colliders = new ArrayList<>();
 
     protected final ImageView viewBinding;
-    protected Rect bounds;
-    protected boolean initialized = false;
+    protected Rect bounds = new Rect();
 
     public Collider(ImageView viewToBind) {
         viewBinding = viewToBind;
 
-        viewBinding.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            bounds = getRectFromImageView();
-            initialized = true;
-        });
+        TickManager.getTickManager().addTickObject(this);
 
+        viewBinding.getViewTreeObserver().addOnGlobalLayoutListener(this::initializeCollider);
+    }
+
+    private void initializeCollider() {
+        bounds = getRectFromImageView();
         colliders.add(this);
     }
 
@@ -34,20 +36,19 @@ public class Collider implements Tickable {
         System.out.println("Colliding with " + other);
     }
 
-    private void checkForCollision() {
-        for (Collider collider : colliders) {
-            if (collider != this && collider != null && collider.initialized) {
-                if (collider.bounds.intersect(bounds)) {
-                    colliding(collider);
+    synchronized private void checkForCollision() {
+        ArrayList<Collider> collidersCopy = new ArrayList<>(colliders);
+        for (Collider otherCollider : collidersCopy) {
+            if (otherCollider != this && otherCollider != null) {
+                if (otherCollider.bounds.intersect(bounds)) {
+                    colliding(otherCollider);
                 }
             }
         }
     }
 
     @Override
-    public void tick(long deltaTime) {
-        if (initialized) {
-            checkForCollision();
-        }
+    synchronized public void tick(long deltaTime) {
+        checkForCollision();
     }
 }

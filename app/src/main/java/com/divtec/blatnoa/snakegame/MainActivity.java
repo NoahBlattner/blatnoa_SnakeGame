@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView square;
     private Button addButton;
 
-    private TickManager tickManager;
     private PhysicsMarble mainPhysics;
 
     private ArrayList<PhysicsMarble> additionalPhysicMarbles = new ArrayList<>();
@@ -55,15 +54,6 @@ public class MainActivity extends AppCompatActivity {
         mainMarble = findViewById(R.id.marble);
         square = findViewById(R.id.centerSquare);
         addButton = findViewById(R.id.addButton);
-
-        // Create tick manager
-        tickManager = TickManager.getTickManager();
-
-        // Create the physics of the main marble
-        mainPhysics = new PhysicsMarble(this, mainMarble, false);
-
-        // Create the collision of the center square
-        new Collider(square);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,14 +89,28 @@ public class MainActivity extends AppCompatActivity {
 
         // Register the listener
         sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+    }
 
-        tickManager.start();
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Create tick manager
+        TickManager.getTickManager();
+
+        // Create the physics of the main marble
+        mainPhysics = new PhysicsMarble(this, mainMarble, false);
+
+        // Create the collision of the center square
+        new Collider(square);
+
+        TickManager.getTickManager().start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        tickManager.stop();
+        TickManager.getTickManager().pause();
     }
 
     /**

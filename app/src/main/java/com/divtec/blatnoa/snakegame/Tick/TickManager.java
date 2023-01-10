@@ -5,14 +5,23 @@ import java.util.concurrent.TimeUnit;
 
 public class TickManager implements Runnable {
 
+    private enum ThreadState {
+        UNINITIALIZED,
+        RUNNING,
+        PAUSED,
+        STOPPED
+    }
+
     private final int MAX_TICK_OBJECTS = 15;
+    
+    private ThreadState threadState = ThreadState.UNINITIALIZED;
 
     private static TickManager instance;
+    private static Thread tickThread;
 
-    private ArrayList<Tickable> tickObjects = new ArrayList<>();
+    private ArrayList<Tickable> tickables = new ArrayList<>();
 
     long lastTime;
-    boolean running;
 
     /**
      * Private constructor to allow singleton
@@ -39,7 +48,7 @@ public class TickManager implements Runnable {
      * @return True if a tick object can be added, false otherwise
      */
     public boolean canAddTickObject() {
-        return tickObjects.size() < MAX_TICK_OBJECTS;
+        return tickables.size() < MAX_TICK_OBJECTS;
     }
 
     /**
@@ -47,34 +56,45 @@ public class TickManager implements Runnable {
      * @param newTickObject The tick object to push to the stack
      */
     public void addTickObject(Tickable newTickObject) {
-        if (canAddTickObject()) {
-            tickObjects.add(newTickObject);
-        } else {
+        if (!canAddTickObject()) {
             throw new StackLimitReachedException();
         }
+        if (tickables.contains(newTickObject)) {
+            throw new TickObjectAlreadyExistsException();
+        }
+
+        tickables.add(newTickObject);
     }
 
     /**
      * Starts the tick thread
      */
-    public void start() {
-        if (running) {
-            throw new TickThreadAlreadyRunningException();
+    synchronized public void start() {
+        if (threadState == ThreadState.UNINITIALIZED) {
+            threadState = ThreadState.RUNNING;
+
+            lastTime = System.currentTimeMillis();
+
+            tickThread = new Thread(this);
+            tickThread.start();
+        } else if (threadState == ThreadState.PAUSED) {
+            resume();
         }
+    }
 
-        lastTime = System.currentTimeMillis();
-
-        running = true;
-
-        Thread tickThread = new Thread(this);
-        tickThread.start();
+    synchronized public void resume() {
+        if (threadState == ThreadState.PAUSED) {
+            threadState = ThreadState.RUNNING;
+        }
     }
 
     /**
      * Stops the tick thread
      */
-    public void stop() {
-        running = false;
+    synchronized public void pause() {
+        if (threadState == ThreadState.RUNNING) {
+            threadState = ThreadState.PAUSED;
+        }
     }
 
     /**
@@ -82,21 +102,31 @@ public class TickManager implements Runnable {
      */
     @Override
     public void run() {
-        while(running) {
-            long currentTime = System.currentTimeMillis();
-            long deltaMS = currentTime - lastTime;
+        while (threadState == ThreadState.RUNNING
+                || threadState == ThreadState.PAUSED) {
 
-            for (Tickable current : tickObjects) {
-                current.tick(deltaMS);
+            while (threadState == ThreadState.RUNNING) {
+                long currentTime = System.currentTimeMillis();
+                long deltaMS = currentTime - lastTime;
+
+                for (Tickable current : tickables) {
+                    current.tick(deltaMS);
+                }
+
+                lastTime = currentTime;
+
+                try {
+                    TimeUnit.MILLISECONDS.sleep(15);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
-            lastTime = currentTime;
-
+            // If the thread is paused, wait for it to be resumed
             try {
-                TimeUnit.MILLISECONDS.sleep(15);
+                TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                throw new RuntimeException(e);
             }
         }
     }

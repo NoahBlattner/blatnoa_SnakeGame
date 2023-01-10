@@ -40,8 +40,6 @@ public class PhysicsMarble extends Collider implements Tickable {
         params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
 
         setPositions((float) Math.random(), (float) Math.random());
-
-        pushToTickObjectStack();
     }
 
     /**
@@ -62,15 +60,6 @@ public class PhysicsMarble extends Collider implements Tickable {
         } else {
             setPositions(0.5f, 0.5f);
         }
-
-        pushToTickObjectStack();
-    }
-
-    /**
-     * Pushes the tick object to the tick object stack
-     */
-    private void pushToTickObjectStack() {
-        TickManager.getTickManager().addTickObject(this);
     }
 
     /**
@@ -178,15 +167,12 @@ public class PhysicsMarble extends Collider implements Tickable {
     @Override
     protected void colliding(Collider other) {
         // Find where the collision happened
-        float xDistance = other.viewBinding.getX() - viewBinding.getX();
-        float yDistance = other.viewBinding.getY() - viewBinding.getY();
-
-        if (xDistance > 0) { // If the collision happened on the right, bounce the marble on the x axis
-            bounceX();
-        } else { // else bounce on the y axis
+        if (bounds.left <= other.bounds.right
+            || bounds.right >= other.bounds.left) { // If the collision happened on the right, bounce the marble on the x axis
             bounceY();
+        } else { // else bounce on the y axis
+            bounceX();
         }
-        moveMarble(1);
     }
 
     /**
@@ -194,7 +180,7 @@ public class PhysicsMarble extends Collider implements Tickable {
      * @param deltaTime The time since the last tick
      */
     @Override
-    public void tick(long deltaTime) {
+    synchronized public void tick(long deltaTime) {
         super.tick(deltaTime);
         addAccelerationValues(deltaTime);
         moveMarble(deltaTime);
