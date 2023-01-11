@@ -84,6 +84,7 @@ public class TickManager implements Runnable {
 
     synchronized public void resume() {
         if (threadState == ThreadState.PAUSED) {
+            lastTime = System.currentTimeMillis();
             threadState = ThreadState.RUNNING;
         }
     }
@@ -118,7 +119,7 @@ public class TickManager implements Runnable {
                 lastTime = currentTime;
 
                 try {
-                    TimeUnit.MILLISECONDS.sleep(15);
+                    TimeUnit.MILLISECONDS.sleep(5);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

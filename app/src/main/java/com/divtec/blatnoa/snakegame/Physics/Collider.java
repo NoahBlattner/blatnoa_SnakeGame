@@ -30,9 +30,6 @@ public class Collider implements Tickable {
      * Initializes the collider
      */
     private void initializeCollider() {
-        if (getBounds().isEmpty()) {
-            throw new RectEmptyException();
-        }
         if (!colliders.contains(this)) {
             colliders.add(this);
         }
@@ -76,6 +73,9 @@ public class Collider implements Tickable {
         }
     }
 
+    /**
+     * Function called on every tick
+     */
     @Override
     synchronized public void tick(long deltaTime) {
         checkForCollision();
