@@ -109,7 +109,9 @@ public class TickManager implements Runnable {
                 long currentTime = System.currentTimeMillis();
                 long deltaMS = currentTime - lastTime;
 
-                for (Tickable current : tickables) {
+                // Copy the tickables array to prevent concurrent modification
+                ArrayList<Tickable> tickablesCopy = new ArrayList<>(tickables);
+                for (Tickable current : tickablesCopy) {
                     current.tick(deltaMS);
                 }
 

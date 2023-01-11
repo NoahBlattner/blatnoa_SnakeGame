@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         TickManager.getTickManager();
 
         // Create the physics of the main marble
-        mainPhysics = new PhysicsMarble(this, mainMarble, false);
+        mainPhysics = new PhysicsMarble(mainMarble, false);
 
         // Create the collision of the center square
         new Collider(square);
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
             lyt.addView(newView);
 
-            PhysicsMarble newMarble = new PhysicsMarble(this, newView);
+            PhysicsMarble newMarble = new PhysicsMarble(newView);
             additionalPhysicMarbles.add(newMarble);
         } else {
             Toast.makeText(this, "Cannot add more marbles", Toast.LENGTH_SHORT).show();

@@ -7,19 +7,26 @@ import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.divtec.blatnoa.snakegame.Tick.StackLimitReachedException;
-import com.divtec.blatnoa.snakegame.Tick.TickManager;
 import com.divtec.blatnoa.snakegame.Tick.Tickable;
 
 public class PhysicsMarble extends Collider implements Tickable {
 
     private final float bounciness = 0.45f;
 
-    private Activity activity;
-    private ConstraintLayout.LayoutParams params;
+    enum CollisionSide {
+        UNKNOWN,
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT
+    }
 
-    private float xPosition = .5f;
-    private float yPosition = .5f;
+    private final ConstraintLayout parentLayout;
+    private int parentWidth = 0;
+    private int parentHeight = 0;
+
+    private float xPosition;
+    private float yPosition;
 
     private static double lastXReading = 0;
     private static double lastYReading = 0;
@@ -29,43 +36,57 @@ public class PhysicsMarble extends Collider implements Tickable {
 
     /**
      * Constructor for the physics marble
-     * @param activity The activity in witch the marble is placed
      * @param viewToBind The image view to use as marble
      */
-    public PhysicsMarble(Activity activity, ImageView viewToBind) {
+    public PhysicsMarble(ImageView viewToBind) {
         super(viewToBind);
 
-        this.activity = activity;
+        parentLayout = (ConstraintLayout) viewToBind.getParent();
 
-        params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
+        viewBinding.getViewTreeObserver().addOnGlobalLayoutListener(this::setParentDimensions);
 
-        setPositions((float) Math.random(), (float) Math.random());
+        setPositions(randomFloat(0, parentWidth-bounds.width()), randomFloat(0, parentHeight-bounds.height()));
     }
 
     /**
      * Constructor for the PhysicsMarble
-     * @param activity The activity in witch the marble is placed
      * @param viewToBind The image view to use as marble
      * @param useRandomStartPosition Whether to use a random start position or start at the center
      */
-    public PhysicsMarble(Activity activity, ImageView viewToBind, boolean useRandomStartPosition) {
+    public PhysicsMarble(ImageView viewToBind, boolean useRandomStartPosition) {
         super(viewToBind);
 
-        this.activity = activity;
+        parentLayout = (ConstraintLayout) viewToBind.getParent();
 
-        params = (ConstraintLayout.LayoutParams) viewToBind.getLayoutParams();
+        viewBinding.getViewTreeObserver().addOnGlobalLayoutListener(this::setParentDimensions);
 
         if (useRandomStartPosition) {
-            setPositions((float) Math.random(), (float) Math.random());
-        } else {
-            setPositions(0.5f, 0.5f);
+            setPositions(randomFloat(0, parentWidth-bounds.width()), randomFloat(0, parentHeight-bounds.height()));
         }
+    }
+
+    /**
+     * Sets the parent dimensions
+     */
+    private void setParentDimensions() {
+        parentWidth = parentLayout.getWidth();
+        parentHeight = parentLayout.getHeight();
+    }
+
+    /**
+     * Gets a random float between two values
+     * @param min The lower bound
+     * @param max The upper bound
+     * @return A random float between the two values
+     */
+    private float randomFloat(float min, float max) {
+        return (float) (Math.random() * (max - min) + min);
     }
 
     /**
      * Updates the accelerometer values
      * @param xAcceleration The current x acceleration
-     * @param yAcceleration
+     * @param yAcceleration The current y acceleration
      */
     public static void updateAccelerationValues(Double xAcceleration, Double yAcceleration) {
         lastXReading = xAcceleration;
@@ -88,20 +109,20 @@ public class PhysicsMarble extends Collider implements Tickable {
     private void moveMarble(long deltaTime) {
 
         PointF screenSizeCM = getPhysicalScreenSizeCM();
-        float xBiasByCM = 1 / screenSizeCM.x;
-        float yBiasByCM = 1 / screenSizeCM.y;
+        float xPixelsByCM = getDisplayMetrics().widthPixels / screenSizeCM.x;
+        float yPixelsByCM = getDisplayMetrics().heightPixels / screenSizeCM.y;
 
         // Using delta time and acceleration, calculate new position
-        float newXPosition = (float) (xPosition + xBiasByCM * xSpeed * 10 * deltaTime / 1000f);
-        float newYPosition = (float) (yPosition + yBiasByCM * ySpeed * 10 * deltaTime / 1000f);
+        float newXPosition = (float) (xPosition + xPixelsByCM * xSpeed * 10 * deltaTime / 1000f);
+        float newYPosition = (float) (yPosition + yPixelsByCM * ySpeed * 10 * deltaTime / 1000f);
 
         if (newXPosition < 0) { // If marble has reached left bound
             // Correct position and bounce marble
             newXPosition = 0;
             bounceX();
-        } else if (newXPosition > 1) { // If marble has reached right bound
+        } else if (newXPosition > parentWidth - bounds.width()) { // If marble has reached right bound
             // Correct position and bounce marble
-            newXPosition = 1;
+            newXPosition = parentWidth - bounds.width();
             bounceX();
         }
 
@@ -109,20 +130,33 @@ public class PhysicsMarble extends Collider implements Tickable {
             // Correct position and bounce marble
             newYPosition = 0;
             bounceY();
-        } else if (newYPosition > 1) { // If marble has reached upper bound
+        } else if (newYPosition > parentHeight - bounds.height()) { // If marble has reached upper bound
             // Correct position and bounce marble
-            newYPosition = 1;
+            newYPosition = parentHeight - bounds.height();
             bounceY();
         }
 
         setPositions(newXPosition, newYPosition);
     }
 
+    /**
+     * Gets the display metrics from the activity
+     * @return The display metrics
+     */
+    private DisplayMetrics getDisplayMetrics() {
+        Activity activity = (Activity) viewBinding.getContext();
+        return activity.getBaseContext().getResources().getDisplayMetrics();
+    }
+
+    /**
+     * Gets the physical screen size in centimeters
+     * @return A PointF with the width and height of the screen in centimeters
+     */
     private PointF getPhysicalScreenSizeCM() {
         PointF screenSize = new PointF();
 
         // Get screen size in cm
-        DisplayMetrics metrics = activity.getBaseContext().getResources().getDisplayMetrics();
+        DisplayMetrics metrics = getDisplayMetrics();
         float pixelWidth = metrics.widthPixels;
         float pixelHeight = metrics.heightPixels;
         pixelWidth /= metrics.xdpi;
@@ -142,36 +176,66 @@ public class PhysicsMarble extends Collider implements Tickable {
         xPosition = newXPosition;
         yPosition = newYPosition;
 
-        params.horizontalBias = xPosition;
-        params.verticalBias = yPosition;
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                viewBinding.setLayoutParams(params);
-            }
-        });
-
+        viewBinding.setX(newXPosition);
+        viewBinding.setY(newYPosition);
     }
 
+    /**
+     * Bounce the marble on the x axis
+     */
     private void bounceX() {
         double randBounceFlux = (Math.random() - .5) * 0.1f;
         xSpeed *= -bounciness + randBounceFlux;
     }
 
+    /**
+     * Bounce the marble on the y axis
+     */
     private void bounceY() {
         double randBounceFlux = (Math.random() - .5) * 0.1f;
         ySpeed *= -bounciness + randBounceFlux;
     }
 
+    /**
+     * Find the side on which the marble is colliding with another collider
+     * @param other The other collider
+     * @return The side on which the marble is colliding
+     */
+    private CollisionSide findCollisionSide(Collider other) {
+        CollisionSide side = CollisionSide.UNKNOWN;
+
+        // Find where the collision happened
+        if (bounds.left <= other.bounds.right) {
+            side = CollisionSide.LEFT;
+        } else if (bounds.right >= other.bounds.left) {
+            side = CollisionSide.RIGHT;
+        } else if (bounds.top <= other.bounds.bottom) {
+            side = CollisionSide.TOP;
+        } else if (bounds.bottom >= other.bounds.top) {
+            side = CollisionSide.BOTTOM;
+        }
+        return side;
+    }
+
     @Override
     protected void colliding(Collider other) {
-        // Find where the collision happened
-        if (bounds.left <= other.bounds.right
-            || bounds.right >= other.bounds.left) { // If the collision happened on the right, bounce the marble on the x axis
-            bounceY();
-        } else { // else bounce on the y axis
-            bounceX();
+        switch (findCollisionSide(other)) {
+            case LEFT:
+                setPositions(xPosition, other.bounds.bottom);
+                bounceY();
+                break;
+            case RIGHT:
+                setPositions(xPosition, other.bounds.top - bounds.height());
+                bounceY();
+                break;
+            case TOP:
+                setPositions(other.bounds.right, yPosition);
+                bounceX();
+                break;
+            case BOTTOM:
+                setPositions(other.bounds.left - bounds.width(), yPosition);
+                bounceX();
+                break;
         }
     }
 
