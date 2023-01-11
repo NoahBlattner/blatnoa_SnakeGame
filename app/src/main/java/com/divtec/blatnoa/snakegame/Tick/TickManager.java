@@ -12,7 +12,7 @@ public class TickManager implements Runnable {
         STOPPED
     }
 
-    private final int MAX_TICK_OBJECTS = 15;
+    private final int MAX_TICK_OBJECTS = 300;
     
     private ThreadState threadState = ThreadState.UNINITIALIZED;
 

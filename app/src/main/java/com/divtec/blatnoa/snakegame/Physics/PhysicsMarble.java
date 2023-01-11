@@ -2,6 +2,7 @@ package com.divtec.blatnoa.snakegame.Physics;
 
 import android.app.Activity;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
@@ -10,9 +11,11 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.divtec.blatnoa.snakegame.Tick.Tickable;
 
 public class PhysicsMarble extends Collider implements Tickable {
-
-    private final float bounciness = 0.45f;
-
+    
+    private final float BOUNCINESS = 0.45f;
+    private final float RAND_BOUNCE_FACTOR = .25f;
+    private final float FRICTION = 0.95f;
+    
     enum CollisionSide {
         UNKNOWN,
         TOP,
@@ -45,7 +48,7 @@ public class PhysicsMarble extends Collider implements Tickable {
 
         viewBinding.getViewTreeObserver().addOnGlobalLayoutListener(this::setParentDimensions);
 
-        setPositions(randomFloat(0, parentWidth-bounds.width()), randomFloat(0, parentHeight-bounds.height()));
+        setPositions(randomFloat(0, parentWidth-getBounds().width()), randomFloat(0, parentHeight-getBounds().height()));
     }
 
     /**
@@ -61,7 +64,7 @@ public class PhysicsMarble extends Collider implements Tickable {
         viewBinding.getViewTreeObserver().addOnGlobalLayoutListener(this::setParentDimensions);
 
         if (useRandomStartPosition) {
-            setPositions(randomFloat(0, parentWidth-bounds.width()), randomFloat(0, parentHeight-bounds.height()));
+            setPositions(randomFloat(0, parentWidth-getBounds().width()), randomFloat(0, parentHeight-getBounds().height()));
         }
     }
 
@@ -113,16 +116,16 @@ public class PhysicsMarble extends Collider implements Tickable {
         float yPixelsByCM = getDisplayMetrics().heightPixels / screenSizeCM.y;
 
         // Using delta time and acceleration, calculate new position
-        float newXPosition = (float) (xPosition + xPixelsByCM * xSpeed * 10 * deltaTime / 1000f);
-        float newYPosition = (float) (yPosition + yPixelsByCM * ySpeed * 10 * deltaTime / 1000f);
+        float newXPosition = (float) (xPosition + xPixelsByCM * xSpeed * FRICTION * 10 * deltaTime / 1000f);
+        float newYPosition = (float) (yPosition + yPixelsByCM * ySpeed * FRICTION * 10 * deltaTime / 1000f);
 
         if (newXPosition < 0) { // If marble has reached left bound
             // Correct position and bounce marble
             newXPosition = 0;
             bounceX();
-        } else if (newXPosition > parentWidth - bounds.width()) { // If marble has reached right bound
+        } else if (newXPosition > parentWidth - getBounds().width()) { // If marble has reached right bound
             // Correct position and bounce marble
-            newXPosition = parentWidth - bounds.width();
+            newXPosition = parentWidth - getBounds().width();
             bounceX();
         }
 
@@ -130,9 +133,9 @@ public class PhysicsMarble extends Collider implements Tickable {
             // Correct position and bounce marble
             newYPosition = 0;
             bounceY();
-        } else if (newYPosition > parentHeight - bounds.height()) { // If marble has reached upper bound
+        } else if (newYPosition > parentHeight - getBounds().height()) { // If marble has reached upper bound
             // Correct position and bounce marble
-            newYPosition = parentHeight - bounds.height();
+            newYPosition = parentHeight - getBounds().height();
             bounceY();
         }
 
@@ -184,16 +187,24 @@ public class PhysicsMarble extends Collider implements Tickable {
      * Bounce the marble on the x axis
      */
     private void bounceX() {
-        double randBounceFlux = (Math.random() - .5) * 0.1f;
-        xSpeed *= -bounciness + randBounceFlux;
+        double randBounceFlux = (Math.random() - RAND_BOUNCE_FACTOR) * 0.1f;
+        xSpeed *= -BOUNCINESS + randBounceFlux;
     }
 
     /**
      * Bounce the marble on the y axis
      */
     private void bounceY() {
-        double randBounceFlux = (Math.random() - .5) * 0.1f;
-        ySpeed *= -bounciness + randBounceFlux;
+        double randBounceFlux = (Math.random() - RAND_BOUNCE_FACTOR) * 0.1f;
+        ySpeed *= -BOUNCINESS + randBounceFlux;
+    }
+
+    private float getAngleOfPoints(float originX, float originY, float targetX, float targetY) {
+        float angle = (float) Math.toDegrees(Math.atan2(targetY - originY, targetX - originX));
+        if (angle < 0) {
+            angle += 360;
+        }
+        return angle;
     }
 
     /**
@@ -204,36 +215,49 @@ public class PhysicsMarble extends Collider implements Tickable {
     private CollisionSide findCollisionSide(Collider other) {
         CollisionSide side = CollisionSide.UNKNOWN;
 
-        // Find where the collision happened
-        if (bounds.left <= other.bounds.right) {
-            side = CollisionSide.LEFT;
-        } else if (bounds.right >= other.bounds.left) {
-            side = CollisionSide.RIGHT;
-        } else if (bounds.top <= other.bounds.bottom) {
+        // Find the side on which the marble is colliding
+        float centerX = getBounds().centerX();
+        float centerY = getBounds().centerY();
+        float otherCenterX = other.getBounds().centerX();
+        float otherCenterY = other.getBounds().centerY();
+
+        float angleToTopLeft = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().left, other.getBounds().top);
+        float angleToTopRight = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().right, other.getBounds().top);
+        float angleToBottomLeft = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().left, other.getBounds().bottom);
+        float angleToBottomRight = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().right, other.getBounds().bottom);
+
+        float angle = getAngleOfPoints(otherCenterX, otherCenterY, centerX, centerY);
+
+        if (angle >= angleToBottomRight && angle < angleToBottomLeft) {
             side = CollisionSide.TOP;
-        } else if (bounds.bottom >= other.bounds.top) {
+        } else if (angle >= angleToBottomLeft && angle < angleToTopLeft) {
+            side = CollisionSide.RIGHT;
+        } else if (angle >= angleToTopLeft && angle < angleToTopRight) {
             side = CollisionSide.BOTTOM;
+        } else if (angle >= angleToTopRight || angle < angleToBottomRight) {
+            side = CollisionSide.LEFT;
         }
+
         return side;
     }
 
     @Override
-    protected void colliding(Collider other) {
+    protected void onCollision(Collider other) {
         switch (findCollisionSide(other)) {
-            case LEFT:
-                setPositions(xPosition, other.bounds.bottom);
-                bounceY();
-                break;
-            case RIGHT:
-                setPositions(xPosition, other.bounds.top - bounds.height());
-                bounceY();
-                break;
             case TOP:
-                setPositions(other.bounds.right, yPosition);
-                bounceX();
+                setPositions(xPosition, other.getBounds().bottom);
+                bounceY();
                 break;
             case BOTTOM:
-                setPositions(other.bounds.left - bounds.width(), yPosition);
+                setPositions(xPosition, other.getBounds().top - getBounds().height());
+                bounceY();
+                break;
+            case LEFT:
+                setPositions(other.getBounds().right, yPosition);
+                bounceX();
+                break;
+            case RIGHT:
+                setPositions(other.getBounds().left - getBounds().width(), yPosition);
                 bounceX();
                 break;
         }
@@ -245,9 +269,9 @@ public class PhysicsMarble extends Collider implements Tickable {
      */
     @Override
     synchronized public void tick(long deltaTime) {
-        super.tick(deltaTime);
         addAccelerationValues(deltaTime);
         moveMarble(deltaTime);
+        super.tick(deltaTime);
     }
 }
 
