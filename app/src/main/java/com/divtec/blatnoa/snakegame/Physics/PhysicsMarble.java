@@ -219,29 +219,23 @@ public class PhysicsMarble extends Collider implements Tickable {
     private CollisionSide findCollisionSide(Collider other) {
         CollisionSide side = CollisionSide.UNKNOWN;
 
-        // Find the side on which the marble is colliding
-        float centerX = getBounds().centerX();
-        float centerY = getBounds().centerY();
-        float otherCenterX = other.getBounds().centerX();
-        float otherCenterY = other.getBounds().centerY();
+        // Get the distance between the two colliders for each side
+        float leftDistance = Math.abs(getBounds().left - other.getBounds().right);
+        float rightDistance = Math.abs(getBounds().right - other.getBounds().left);
+        float topDistance = Math.abs(getBounds().top - other.getBounds().bottom);
+        float bottomDistance = Math.abs(getBounds().bottom - other.getBounds().top);
 
-        float angleToTopLeft = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().left, other.getBounds().top);
-        float angleToTopRight = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().right, other.getBounds().top);
-        float angleToBottomLeft = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().left, other.getBounds().bottom);
-        float angleToBottomRight = getAngleOfPoints(otherCenterX, otherCenterY, other.getBounds().right, other.getBounds().bottom);
+        float minDistance = Math.min(Math.min(leftDistance, rightDistance), Math.min(topDistance, bottomDistance));
 
-        float angle = getAngleOfPoints(otherCenterX, otherCenterY, centerX, centerY);
-
-        if (angle >= angleToBottomRight && angle < angleToBottomLeft) {
-            side = CollisionSide.TOP;
-        } else if (angle >= angleToBottomLeft && angle < angleToTopLeft) {
-            side = CollisionSide.RIGHT;
-        } else if (angle >= angleToTopLeft && angle < angleToTopRight) {
-            side = CollisionSide.BOTTOM;
-        } else if (angle >= angleToTopRight || angle < angleToBottomRight) {
+        if (minDistance == leftDistance) {
             side = CollisionSide.LEFT;
+        } else if (minDistance == rightDistance) {
+            side = CollisionSide.RIGHT;
+        } else if (minDistance == topDistance) {
+            side = CollisionSide.TOP;
+        } else if (minDistance == bottomDistance) {
+            side = CollisionSide.BOTTOM;
         }
-
         return side;
     }
 
