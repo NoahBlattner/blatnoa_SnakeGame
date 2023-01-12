@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.divtec.blatnoa.snakegame.Physics.Collider;
+import com.divtec.blatnoa.snakegame.Physics.DuplicateColliderException;
 import com.divtec.blatnoa.snakegame.Physics.PhysicsMarble;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
 
@@ -37,9 +38,7 @@ public class PhysicsActivity extends AppCompatActivity {
     private ImageView square;
     private Button addButton;
 
-    private PhysicsMarble mainPhysics;
-
-    private ArrayList<PhysicsMarble> additionalPhysicMarbles = new ArrayList<>();
+    private final ArrayList<PhysicsMarble> additionalPhysicMarbles = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +87,7 @@ public class PhysicsActivity extends AppCompatActivity {
         };
 
         // Register the listener
-        sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -98,13 +97,29 @@ public class PhysicsActivity extends AppCompatActivity {
         // Create tick manager
         TickManager.getTickManager();
 
-        // Create the physics of the main marble
-        mainPhysics = new PhysicsMarble(mainMarble, false);
+        try {
+            // Create the physics of the main marble
+            new PhysicsMarble(mainMarble, false);
+        } catch (DuplicateColliderException e) {
+            e.printStackTrace();
+        }
 
-        // Create the collision of the center square
-        new Collider(square);
+        try {
+            // Create the collision of the center square
+            new Collider(square);
+        } catch (DuplicateColliderException e) {
+            e.printStackTrace();
+        }
 
         TickManager.getTickManager().start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        TickManager.getTickManager().stop();
+        Collider.clearStack();
     }
 
     @Override

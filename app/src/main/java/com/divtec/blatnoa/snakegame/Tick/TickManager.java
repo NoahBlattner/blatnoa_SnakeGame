@@ -69,8 +69,8 @@ public class TickManager implements Runnable {
     /**
      * Starts the tick thread
      */
-    synchronized public void start() {
-        if (threadState == ThreadState.UNINITIALIZED) {
+    public void start() {
+        if (threadState == ThreadState.UNINITIALIZED || threadState == ThreadState.STOPPED) {
             threadState = ThreadState.RUNNING;
 
             lastTime = System.currentTimeMillis();
@@ -82,7 +82,7 @@ public class TickManager implements Runnable {
         }
     }
 
-    synchronized public void resume() {
+    public void resume() {
         if (threadState == ThreadState.PAUSED) {
             lastTime = System.currentTimeMillis();
             threadState = ThreadState.RUNNING;
@@ -92,9 +92,16 @@ public class TickManager implements Runnable {
     /**
      * Stops the tick thread
      */
-    synchronized public void pause() {
+    public void pause() {
         if (threadState == ThreadState.RUNNING) {
             threadState = ThreadState.PAUSED;
+        }
+    }
+
+    public void stop() {
+        if (threadState == ThreadState.RUNNING || threadState == ThreadState.PAUSED) {
+            threadState = ThreadState.STOPPED;
+            tickables.clear();
         }
     }
 

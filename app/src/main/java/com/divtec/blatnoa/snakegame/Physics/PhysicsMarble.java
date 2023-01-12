@@ -92,8 +92,8 @@ public class PhysicsMarble extends Collider implements Tickable {
      * @param yAcceleration The current y acceleration
      */
     public static void updateAccelerationValues(Double xAcceleration, Double yAcceleration) {
-        lastXReading = xAcceleration;
-        lastYReading = yAcceleration;
+        lastXReading += xAcceleration - lastXReading;
+        lastYReading += yAcceleration - lastYReading;
     }
 
     /**
@@ -179,8 +179,12 @@ public class PhysicsMarble extends Collider implements Tickable {
         xPosition = newXPosition;
         yPosition = newYPosition;
 
-        viewBinding.setX(newXPosition);
-        viewBinding.setY(newYPosition);
+        // Update the view position in the UI thread
+        Activity activity = (Activity) viewBinding.getContext();
+        activity.runOnUiThread(() -> {
+            viewBinding.setX(newXPosition);
+            viewBinding.setY(newYPosition);
+        });
     }
 
     /**
@@ -268,7 +272,7 @@ public class PhysicsMarble extends Collider implements Tickable {
      * @param deltaTime The time since the last tick
      */
     @Override
-    synchronized public void tick(long deltaTime) {
+    public void tick(long deltaTime) {
         addAccelerationValues(deltaTime);
         moveMarble(deltaTime);
         super.tick(deltaTime);

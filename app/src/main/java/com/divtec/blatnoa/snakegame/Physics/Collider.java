@@ -19,6 +19,14 @@ public class Collider implements Tickable {
      * @param viewToBind The view that is bound to the collider
      */
     public Collider(ImageView viewToBind) {
+        // Check if another collider bound to this view exists
+        colliders.forEach(collider -> {
+            if (collider.viewBinding == viewToBind) {
+                // If so, throw an exception to avoid double binding
+                throw new DuplicateColliderException();
+            }
+        });
+
         viewBinding = viewToBind;
 
         TickManager.getTickManager().addTickObject(this);
@@ -60,7 +68,7 @@ public class Collider implements Tickable {
      * Checks for collision with all other colliders
      * onCollision event is called if a collision is detected
      */
-    synchronized private void checkForCollision() {
+    private void checkForCollision() {
         ArrayList<Collider> collidersCopy = new ArrayList<>(colliders);
         for (Collider otherCollider : collidersCopy) {
             if (otherCollider != this && otherCollider != null) {
@@ -74,10 +82,17 @@ public class Collider implements Tickable {
     }
 
     /**
+     * Clears all colliders
+     */
+    public static void clearStack() {
+        colliders.clear();
+    }
+
+    /**
      * Function called on every tick
      */
     @Override
-    synchronized public void tick(long deltaTime) {
+    public void tick(long deltaTime) {
         checkForCollision();
     }
 }
