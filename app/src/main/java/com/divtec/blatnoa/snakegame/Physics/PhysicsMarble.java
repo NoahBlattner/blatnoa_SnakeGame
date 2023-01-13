@@ -13,8 +13,11 @@ import com.divtec.blatnoa.snakegame.Tick.Tickable;
 public class PhysicsMarble extends Collider implements Tickable {
     
     private final float BOUNCINESS = 0.45f;
-    private final float RAND_BOUNCE_FACTOR = .25f;
+    private final float MAX_RAND_BOUNCE_FLUX = .25f;
     private final float FRICTION = 0.95f;
+
+    private float nextX;
+    private float nextY;
     
     enum CollisionSide {
         UNKNOWN,
@@ -106,10 +109,10 @@ public class PhysicsMarble extends Collider implements Tickable {
     }
 
     /**
-     * Move the marble to a new position according to it's speed
-     * @param deltaTime The time since the last update
+     * Calculates the next positions of the marble
+     * @param deltaTime The time since the last tick
      */
-    private void moveMarble(long deltaTime) {
+    private void calculateNextPosition(long deltaTime) {
 
         PointF screenSizeCM = getPhysicalScreenSizeCM();
         float xPixelsByCM = getDisplayMetrics().widthPixels / screenSizeCM.x;
@@ -139,7 +142,8 @@ public class PhysicsMarble extends Collider implements Tickable {
             bounceY();
         }
 
-        setPositions(newXPosition, newYPosition);
+        nextX = newXPosition;
+        nextY = newYPosition;
     }
 
     /**
@@ -191,7 +195,7 @@ public class PhysicsMarble extends Collider implements Tickable {
      * Bounce the marble on the x axis
      */
     private void bounceX() {
-        double randBounceFlux = (Math.random() - RAND_BOUNCE_FACTOR) * 0.1f;
+        double randBounceFlux = randomFloat(0, MAX_RAND_BOUNCE_FLUX);
         xSpeed *= -BOUNCINESS + randBounceFlux;
     }
 
@@ -199,16 +203,8 @@ public class PhysicsMarble extends Collider implements Tickable {
      * Bounce the marble on the y axis
      */
     private void bounceY() {
-        double randBounceFlux = (Math.random() - RAND_BOUNCE_FACTOR) * 0.1f;
+        double randBounceFlux = randomFloat(0, MAX_RAND_BOUNCE_FLUX);
         ySpeed *= -BOUNCINESS + randBounceFlux;
-    }
-
-    private float getAngleOfPoints(float originX, float originY, float targetX, float targetY) {
-        float angle = (float) Math.toDegrees(Math.atan2(targetY - originY, targetX - originX));
-        if (angle < 0) {
-            angle += 360;
-        }
-        return angle;
     }
 
     /**
@@ -225,6 +221,7 @@ public class PhysicsMarble extends Collider implements Tickable {
         float topDistance = Math.abs(getBounds().top - other.getBounds().bottom);
         float bottomDistance = Math.abs(getBounds().bottom - other.getBounds().top);
 
+        // Find the smallest distance
         float minDistance = Math.min(Math.min(leftDistance, rightDistance), Math.min(topDistance, bottomDistance));
 
         if (minDistance == leftDistance) {
@@ -239,26 +236,65 @@ public class PhysicsMarble extends Collider implements Tickable {
         return side;
     }
 
+    /**
+     * Set the speed of the marble
+     * @param xSpeed The new x speed
+     * @param ySpeed The new y speed
+     */
+    protected void setSpeed(double xSpeed, double ySpeed) {
+        this.xSpeed = xSpeed;
+        this.ySpeed = ySpeed;
+    }
+
     @Override
     protected void onCollision(Collider other) {
-        switch (findCollisionSide(other)) {
+        CollisionSide side = findCollisionSide(other);
+
+        // If other is a marble
+        if (other instanceof PhysicsMarble) {
+            // Transfer speed
+            // TODO Marble passes speed to other, then other passes speed back to this when
+            // TODO it's collision is processed -> Same speed is passed back and forth
+            PhysicsMarble otherMarble = (PhysicsMarble) other;
+            otherMarble.setSpeed(xSpeed * -BOUNCINESS, ySpeed * -BOUNCINESS);
+        } else { // The marble is colliding with something else
+            // Bounce the marble
+            switch (side) {
+                case TOP:
+                case BOTTOM:
+                    bounceY();
+                    break;
+                case LEFT:
+                case RIGHT:
+                    bounceX();
+                    break;
+            }
+        }
+
+        // Adapt next positions to collision
+        switch (side) {
             case TOP:
-                setPositions(xPosition, other.getBounds().bottom);
-                bounceY();
+                nextY = other.getBounds().bottom + 1;
                 break;
             case BOTTOM:
-                setPositions(xPosition, other.getBounds().top - getBounds().height());
-                bounceY();
+                nextY = other.getBounds().top - getBounds().height() - 1;
                 break;
             case LEFT:
-                setPositions(other.getBounds().right, yPosition);
-                bounceX();
+                nextX = other.getBounds().right + 1;
                 break;
             case RIGHT:
-                setPositions(other.getBounds().left - getBounds().width(), yPosition);
-                bounceX();
+                nextX = other.getBounds().left - getBounds().width() - 1;
                 break;
         }
+    }
+
+    @Override
+    protected void checkForCollision(Rect bounds) {
+        int xDiff = (int) (nextX - xPosition);
+        int yDiff = (int) (nextY - yPosition);
+        Rect futureRect = new Rect(bounds.left + xDiff, bounds.top + yDiff,
+                                 bounds.right + xDiff, bounds.bottom + yDiff);
+        super.checkForCollision(futureRect);
     }
 
     /**
@@ -267,9 +303,17 @@ public class PhysicsMarble extends Collider implements Tickable {
      */
     @Override
     public void tick(long deltaTime) {
+        // Update the acceleration since the last tick
         addAccelerationValues(deltaTime);
-        moveMarble(deltaTime);
+
+        // Calculate the next position
+        calculateNextPosition(deltaTime);
+
+        // Use collider tick to check for collisions
         super.tick(deltaTime);
+
+        // Set the new position
+        setPositions(nextX, nextY);
     }
 }
 

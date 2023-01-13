@@ -38,8 +38,6 @@ public class PhysicsActivity extends AppCompatActivity {
     private ImageView square;
     private Button addButton;
 
-    private final ArrayList<PhysicsMarble> additionalPhysicMarbles = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,12 +146,13 @@ public class PhysicsActivity extends AppCompatActivity {
      */
     private void addNewMarble() {
         if (TickManager.getTickManager().canAddTickObject()) {
-            ImageView newView = createNewMarbleView();
+            ImageView newView = createNewDefaultMarbleView();
 
             lyt.addView(newView);
+            newView.setX(mainMarble.getX());
+            newView.setY(mainMarble.getY());
 
             PhysicsMarble newMarble = new PhysicsMarble(newView);
-            additionalPhysicMarbles.add(newMarble);
         } else {
             Toast.makeText(this, "Cannot add more marbles", Toast.LENGTH_SHORT).show();
         }
@@ -165,18 +164,13 @@ public class PhysicsActivity extends AppCompatActivity {
      * @return The new marble view
      */
     @NonNull
-    private ImageView createNewMarbleView() {
+    private ImageView createNewDefaultMarbleView() {
         ImageView newView = new ImageView(this);
-        ConstraintLayout.LayoutParams newParams = new ConstraintLayout.LayoutParams(20, 20);
+        newView.setMinimumWidth(25);
+        newView.setMinimumHeight(25);
+        //ConstraintLayout.LayoutParams newParams = new ConstraintLayout.LayoutParams(25, 25);
 
-        // Set up constraints
-        int id = lyt.getId();
-        newParams.topToTop = id;
-        newParams.bottomToBottom = id;
-        newParams.startToStart = id;
-        newParams.endToEnd = id;
-
-        newView.setLayoutParams(newParams);
+        //newView.setLayoutParams(newParams);
         newView.setImageResource(R.drawable.marble);
         return newView;
     }

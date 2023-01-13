@@ -68,11 +68,10 @@ public class Collider implements Tickable {
      * Checks for collision with all other colliders
      * onCollision event is called if a collision is detected
      */
-    private void checkForCollision() {
+    protected void checkForCollision(Rect bounds) {
         ArrayList<Collider> collidersCopy = new ArrayList<>(colliders);
         for (Collider otherCollider : collidersCopy) {
             if (otherCollider != this && otherCollider != null) {
-                Rect bounds = getBounds();
                 Rect otherBounds = otherCollider.getBounds();
                 if (otherBounds.intersect(bounds)) {
                     onCollision(otherCollider);
@@ -93,6 +92,6 @@ public class Collider implements Tickable {
      */
     @Override
     public void tick(long deltaTime) {
-        checkForCollision();
+        checkForCollision(getBounds());
     }
 }
