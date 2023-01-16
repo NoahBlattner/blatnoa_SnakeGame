@@ -12,6 +12,27 @@ import java.util.ArrayList;
 
 public class Snake implements Tickable {
 
+    private static class SnakeCell {
+        private enum CellType {
+            HEAD,
+            BODY,
+            TAIL,
+            FOOD,
+            EMPTY
+        }
+        private final int x;
+        private final int y;
+        private final Direction direction;
+        private final CellType type;
+
+        public SnakeCell(int x, int y, Direction direction, CellType cellType) {
+            this.x = x;
+            this.y = y;
+            this.direction = direction;
+            this.type = cellType;
+        }
+    }
+
     /**
      * Direction enum
      */
@@ -60,33 +81,33 @@ public class Snake implements Tickable {
     }
 
     private final GridLayout grid;
+    private final SnakeCell[][] cells;
 
     private Direction direction = Direction.RIGHT;
 
     int moveTimeMS = 1000;
     int timeSinceLastMove = 0;
 
-    private final ImageView head;
-    private final ArrayList<ImageView> body = new ArrayList<>();
-
     /**
      * Constructor for the snake
      * @param playingFieldGrid The grid to use as playing field
      */
     public Snake(GridLayout playingFieldGrid) {
-        TickManager.getTickManager().addTickObject(this);
+        // Create cells
         this.grid = playingFieldGrid;
-        ImageView centerImage = (ImageView) getCenterCellView();
-        centerImage.setImageResource(R.drawable.snake_head);
-        centerImage.setAdjustViewBounds(true);
-        head = centerImage;
-    }
+        cells = new SnakeCell[grid.getColumnCount()][grid.getRowCount()];
 
-    private View getCenterCellView() {
+        TickManager.getTickManager().addTickObject(this);
+
+        // Create snake head
         int x = grid.getColumnCount() / 2;
         int y = grid.getRowCount() / 2;
 
-        return grid.getChildAt(x + y * grid.getColumnCount());
+        cells[x][y] = new SnakeCell(x, y, direction, SnakeCell.CellType.HEAD);
+
+        ImageView centerImage = (ImageView) grid.getChildAt(x + y * grid.getColumnCount());
+        centerImage.setImageResource(R.drawable.snake_head);
+        centerImage.setAdjustViewBounds(true);
     }
 
     public void turn(Direction newDirection) {
@@ -96,8 +117,7 @@ public class Snake implements Tickable {
     }
 
     private void move() {
-        head.setRotation(direction.rotation);
-        System.out.println(direction.rotation);
+        // TODO
     }
 
     @Override

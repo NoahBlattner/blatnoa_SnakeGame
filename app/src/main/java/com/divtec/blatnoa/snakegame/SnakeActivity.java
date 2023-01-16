@@ -1,7 +1,6 @@
 package com.divtec.blatnoa.snakegame;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.pm.ActivityInfo;
@@ -13,6 +12,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
+import com.divtec.blatnoa.snakegame.Snake.SnakeAdapter;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
 
 public class SnakeActivity extends AppCompatActivity {
@@ -144,5 +144,13 @@ public class SnakeActivity extends AppCompatActivity {
         // Register the listener
         sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         TickManager.getTickManager().start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unregister the listener
+        sensorManager.unregisterListener(acceleroListener);
+        TickManager.getTickManager().stop();
     }
 }
