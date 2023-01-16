@@ -99,7 +99,7 @@ public class SnakeActivity extends AppCompatActivity {
             lyt.setPadding(xPadding, yPadding, xPadding, yPadding);
 
             // Generate cells
-            boolean cellType1 = true;
+            boolean cellColor1 = true;
             boolean switchOnNewRow = grid.getColumnCount() % 2 == 0;
             for (int i = 0; i < grid.getRowCount(); i++) {
                 for (int j = 0; j < grid.getColumnCount(); j++) {
@@ -110,18 +110,17 @@ public class SnakeActivity extends AppCompatActivity {
                     cell.setMaxHeight(cellSize);
 
                     // Alternate background between cells
-                    cell.setBackground(AppCompatResources.getDrawable(this,
-                            cellType1 ? R.drawable.cell_1 : R.drawable.cell_2));
+                    cell.setBackgroundColor(getColor(cellColor1 ? R.color.cell1 : R.color.cell2));
 
                     // Add the cell to the grid
                     grid.addView(cell);
 
-                    cellType1 = !cellType1;
+                    cellColor1 = !cellColor1;
                 }
                 // If the grid has an uneven number of columns
                 if (switchOnNewRow) {
                     // Alternate the first cell type on each row
-                    cellType1 = !cellType1;
+                    cellColor1 = !cellColor1;
                 }
             }
 
