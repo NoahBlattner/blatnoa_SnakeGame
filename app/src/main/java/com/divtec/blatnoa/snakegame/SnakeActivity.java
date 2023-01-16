@@ -13,6 +13,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
+import com.divtec.blatnoa.snakegame.Tick.TickManager;
 
 public class SnakeActivity extends AppCompatActivity {
 
@@ -50,16 +51,25 @@ public class SnakeActivity extends AppCompatActivity {
                 float x = event.values[0];
                 float y = event.values[1];
 
-                if (Math.abs(x) > 0.5) {
-                    if (x > 0) {
+                float absX = Math.abs(x);
+                float absY = Math.abs(y);
+                float maxAbs = Math.max(absX, absY);
+
+                // If the highest reading is below 0.5, ignore
+                if (maxAbs < 1.5) {
+                    return;
+                }
+
+                if (maxAbs == absX) { // If the highest reading is on the X axis
+                    if (x > 0) { // If the reading is positive
                         snake.turn(Snake.Direction.DOWN);
-                    } else {
+                    } else { // If the reading is negative
                         snake.turn(Snake.Direction.UP);
                     }
-                } else if (Math.abs(y) > 0.5) {
-                    if (y > 0) {
+                } else { // If the highest reading is on the Y axis
+                    if (y > 0) { // If the reading is positive
                         snake.turn(Snake.Direction.RIGHT);
-                    } else {
+                    } else { // If the reading is negative
                         snake.turn(Snake.Direction.LEFT);
                     }
                 }
@@ -125,7 +135,7 @@ public class SnakeActivity extends AppCompatActivity {
             }
 
             // Create the snake
-            snake = new Snake(grid, cellSize);
+            snake = new Snake(grid);
             startGame();
         }
     }
@@ -133,5 +143,6 @@ public class SnakeActivity extends AppCompatActivity {
     private void startGame() {
         // Register the listener
         sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        TickManager.getTickManager().start();
     }
 }
