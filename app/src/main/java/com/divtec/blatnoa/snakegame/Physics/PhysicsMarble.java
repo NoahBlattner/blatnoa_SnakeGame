@@ -37,8 +37,8 @@ public class PhysicsMarble extends Collider implements Tickable {
     private static double lastXReading = 0;
     private static double lastYReading = 0;
 
-    private double xSpeed = 0;
-    private double ySpeed = 0;
+    private double currentSpeedX = 0;
+    private double currentSpeedY = 0;
 
     /**
      * Constructor for the physics marble
@@ -104,23 +104,23 @@ public class PhysicsMarble extends Collider implements Tickable {
      */
     private void addAccelerationValues(long deltaTime) {
         // IMPORTANT -> X and Y are inverted due to landscape mode
-        ySpeed += lastXReading * deltaTime / 1000;
-        xSpeed -= lastYReading * deltaTime / 1000;
+        currentSpeedY += lastXReading * deltaTime / 1000;
+        currentSpeedX -= lastYReading * deltaTime / 1000;
     }
 
     /**
      * Calculates the next positions of the marble
      * @param deltaTime The time since the last tick
      */
-    private void calculateNextPosition(long deltaTime) {
+    private void findNextPosition(long deltaTime) {
 
         PointF screenSizeCM = getPhysicalScreenSizeCM();
         float xPixelsByCM = getDisplayMetrics().widthPixels / screenSizeCM.x;
         float yPixelsByCM = getDisplayMetrics().heightPixels / screenSizeCM.y;
 
         // Using delta time and acceleration, calculate new position
-        float newXPosition = (float) (xPosition + xPixelsByCM * xSpeed * FRICTION * 10 * deltaTime / 1000f);
-        float newYPosition = (float) (yPosition + yPixelsByCM * ySpeed * FRICTION * 10 * deltaTime / 1000f);
+        float newXPosition = (float) (xPosition + xPixelsByCM * currentSpeedX * FRICTION * 10 * deltaTime / 1000f);
+        float newYPosition = (float) (yPosition + yPixelsByCM * currentSpeedY * FRICTION * 10 * deltaTime / 1000f);
 
         if (newXPosition < 0) { // If marble has reached left bound
             // Correct position and bounce marble
@@ -196,7 +196,7 @@ public class PhysicsMarble extends Collider implements Tickable {
      */
     private void bounceX() {
         double randBounceFlux = randomFloat(0, MAX_RAND_BOUNCE_FLUX);
-        xSpeed *= -BOUNCINESS + randBounceFlux;
+        currentSpeedX *= -BOUNCINESS + randBounceFlux;
     }
 
     /**
@@ -204,7 +204,7 @@ public class PhysicsMarble extends Collider implements Tickable {
      */
     private void bounceY() {
         double randBounceFlux = randomFloat(0, MAX_RAND_BOUNCE_FLUX);
-        ySpeed *= -BOUNCINESS + randBounceFlux;
+        currentSpeedY *= -BOUNCINESS + randBounceFlux;
     }
 
     /**
@@ -242,48 +242,29 @@ public class PhysicsMarble extends Collider implements Tickable {
      * @param ySpeed The new y speed
      */
     protected void setSpeed(double xSpeed, double ySpeed) {
-        this.xSpeed = xSpeed;
-        this.ySpeed = ySpeed;
+        this.currentSpeedX = xSpeed;
+        this.currentSpeedY = ySpeed;
     }
 
     @Override
     protected void onCollision(Collider other) {
-        CollisionSide side = findCollisionSide(other);
-
-        // If other is a marble
-        if (other instanceof PhysicsMarble) {
-            // Transfer speed
-            // TODO Marble passes speed to other, then other passes speed back to this when
-            // TODO it's collision is processed -> Same speed is passed back and forth
-            PhysicsMarble otherMarble = (PhysicsMarble) other;
-            otherMarble.setSpeed(xSpeed * -BOUNCINESS, ySpeed * -BOUNCINESS);
-        } else { // The marble is colliding with something else
-            // Bounce the marble
-            switch (side) {
-                case TOP:
-                case BOTTOM:
-                    bounceY();
-                    break;
-                case LEFT:
-                case RIGHT:
-                    bounceX();
-                    break;
-            }
-        }
-
         // Adapt next positions to collision
-        switch (side) {
+        switch (findCollisionSide(other)) {
             case TOP:
-                nextY = other.getBounds().bottom + 1;
+                nextY = other.getBounds().bottom;
+                bounceY();
                 break;
             case BOTTOM:
-                nextY = other.getBounds().top - getBounds().height() - 1;
+                nextY = other.getBounds().top - getBounds().height();
+                bounceY();
                 break;
             case LEFT:
-                nextX = other.getBounds().right + 1;
+                nextX = other.getBounds().right;
+                bounceX();
                 break;
             case RIGHT:
-                nextX = other.getBounds().left - getBounds().width() - 1;
+                nextX = other.getBounds().left - getBounds().width();
+                bounceX();
                 break;
         }
     }
@@ -307,7 +288,7 @@ public class PhysicsMarble extends Collider implements Tickable {
         addAccelerationValues(deltaTime);
 
         // Calculate the next position
-        calculateNextPosition(deltaTime);
+        findNextPosition(deltaTime);
 
         // Use collider tick to check for collisions
         super.tick(deltaTime);
