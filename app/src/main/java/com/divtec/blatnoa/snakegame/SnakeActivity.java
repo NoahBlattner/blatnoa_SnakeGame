@@ -114,6 +114,7 @@ public class SnakeActivity extends AppCompatActivity {
             for (int i = 0; i < grid.getRowCount(); i++) {
                 for (int j = 0; j < grid.getColumnCount(); j++) {
                     ImageView cell = new ImageView(this);
+                    cell.setAdjustViewBounds(true);
                     cell.setMinimumWidth(cellSize);
                     cell.setMinimumHeight(cellSize);
                     cell.setMaxWidth(cellSize);

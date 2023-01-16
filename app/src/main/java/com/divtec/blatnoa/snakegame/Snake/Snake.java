@@ -89,13 +89,14 @@ public class Snake implements Tickable {
 
     private SnakeAdapter adapter;
     private final ArrayList<GameCell> bodyCells = new ArrayList<>();
-    private final GameCell head;
+    private GameCell head;
     private final ArrayList<GameCell> foodCells = new ArrayList<>();
 
     private Direction nextDirection = Direction.RIGHT;
 
-    int moveTimeMS = 1000;
-    int timeSinceLastMove = 0;
+    private final int MIN_MOVE_TIME_MS = 100;
+    private int moveTimeMS = 1000;
+    private int timeSinceLastMove = 0;
 
     /**
      * Constructor for the snake
@@ -105,7 +106,7 @@ public class Snake implements Tickable {
         this.grid = playingFieldGrid;
 
         // Bind to adapter
-        adapter = new SnakeAdapter(grid);
+        adapter = new SnakeAdapter(this);
 
         TickManager.getTickManager().addTickObject(this);
 
@@ -118,13 +119,10 @@ public class Snake implements Tickable {
 
         ImageView centerImage = (ImageView) grid.getChildAt(x + y * grid.getColumnCount());
         centerImage.setImageResource(R.drawable.snake_head);
-        centerImage.setAdjustViewBounds(true);
 
         createFood();
-    }
 
-    private int randomInt(int min, int max) {
-        return (int) (Math.random() * (max - min + 1) + min);
+        adapter.updateGrid(head, null, foodCells);
     }
 
     public void turn(Direction newDirection) {
@@ -140,12 +138,12 @@ public class Snake implements Tickable {
         do {
             randX = (int) (Math.random() * grid.getColumnCount());
             randY = (int) (Math.random() * grid.getRowCount());
-        } while (!positionFree(randX, randY));
+        } while (!positionValid(randX, randY));
 
         foodCells.add(new GameCell(randX, randY, null));
     }
 
-    private boolean positionFree(int x, int y) {
+    private boolean positionValid(int x, int y) {
         if (x < 0 || x >= grid.getColumnCount() || y < 0 || y >= grid.getRowCount()) {
             return false;
         }
@@ -190,42 +188,50 @@ public class Snake implements Tickable {
                 break;
         }
 
-        // Check if new position is out of bounds
-        if (!positionFree(newX, newY)) {
-            // TODO game over
-            return;
-        }
-
-        if (bodyCells.size() > 0) { // If has body add body cell to take the head's place
-        }
-        // Move head
-        head.x = newX;
-        head.y = newY;
-        head.direction = nextDirection;
-
         boolean removeTail = true;
         if (isFoodCell(newX, newY)) { // If new position is food
             // Don't remove tail
             removeTail = false;
-            foodCells.remove(0);
-
-            // Create new food
-            createFood();
+            onEatFood();
+        } else if (!positionValid(newX, newY)) { // Check if new position is out of bounds
+            System.out.println("Game over");
+            return;
         }
 
-        GameCell firstBodyCell = null;
-        if (bodyCells.size() > 0) { // If has body
-            // Move body
-            firstBodyCell = new GameCell(head.x, head.y, nextDirection);
-            bodyCells.add(firstBodyCell);
-            if (removeTail) {
-                // Remove tail
-                bodyCells.remove(0);
-            }
+        // Move head
+        head = new GameCell(newX, newY, nextDirection);
+
+        // Add new body
+        GameCell firstBodyCell = new GameCell(head.x, head.y, nextDirection);
+        bodyCells.add(firstBodyCell);
+        if (removeTail) { // If not eating food
+            // Remove last body
+            bodyCells.remove(0);
         }
 
         // Update grid
         adapter.updateGrid(head, firstBodyCell, foodCells);
+    }
+
+    private void onEatFood() {
+        // Remove food
+        foodCells.remove(0);
+
+        // Create new food
+        createFood();
+
+        // Increase move time
+        if (moveTimeMS > MIN_MOVE_TIME_MS) {
+            moveTimeMS -= 15;
+        }
+    }
+
+    public ArrayList<GameCell> getBodyCells() {
+        return bodyCells;
+    }
+
+    public GridLayout getGrid() {
+        return grid;
     }
 
     @Override
