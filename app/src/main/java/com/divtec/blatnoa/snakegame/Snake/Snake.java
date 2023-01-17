@@ -253,12 +253,6 @@ public class Snake implements Tickable {
         // Update direction
         currentDirection = nextDirection;
 
-        if (!positionValid(newX, newY)) { // If new position isn't free
-            // Game over
-            gameOver();
-            return;
-        }
-
         boolean hasEaten = false;
         if (isFoodCell(newX, newY)) { // If new position is food
             hasEaten = true;
@@ -273,6 +267,12 @@ public class Snake implements Tickable {
         if (!hasEaten && bodyCells.size() > 0) { // If snake hasn't eaten and has body
             // Remove last body cell
             bodyCells.remove(0);
+        }
+
+        if (!positionValid(newX, newY)) { // If new position isn't free
+            // Game over
+            gameOver();
+            return;
         }
 
         // Move head
