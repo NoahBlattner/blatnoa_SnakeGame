@@ -12,10 +12,10 @@ import java.util.ArrayList;
 public class Snake implements Tickable {
 
     protected static class GameCell {
+
         public int x;
         public int y;
         public Direction direction = Direction.NONE;
-
         public GameCell(int x, int y, Direction direction) {
             this.x = x;
             this.y = y;
@@ -30,8 +30,8 @@ public class Snake implements Tickable {
             }
             return false;
         }
-    }
 
+    }
     /**
      * Direction enum
      */
@@ -42,8 +42,8 @@ public class Snake implements Tickable {
         RIGHT(270),
         NONE(-1);
 
-        public final int rotation;
 
+        public final int rotation;
         /**
          * Enum constructor
          * @param rotation The rotation associated with this direction
@@ -110,6 +110,7 @@ public class Snake implements Tickable {
             }
             return NONE;
         }
+
     }
 
     private GridLayout grid;
@@ -123,8 +124,10 @@ public class Snake implements Tickable {
     private Direction nextDirection = Direction.RIGHT;
 
     private final int MIN_MOVE_TIME_MS = 100;
+    public static final int MOVE_TIME_DECREASE_MS = 15;
     private int moveTimeMS = 1000;
     private int timeSinceLastMove = 0;
+    private int foodsEaten = 0;
 
     /**
      * Constructor for the snake
@@ -148,7 +151,7 @@ public class Snake implements Tickable {
         ImageView centerImage = (ImageView) grid.getChildAt(x + y * grid.getColumnCount());
         centerImage.setImageResource(R.drawable.snake_head);
 
-        createFood(1);
+        createFood(2);
 
         adapter.initGrid(head, foodCells);
     }
@@ -279,15 +282,17 @@ public class Snake implements Tickable {
      * Called when the snake eats food
      */
     private void onEatFood() {
+        foodsEaten++;
         // Remove food
         foodCells.remove(0);
 
         // Create new food
-        createFood(1);
+        // Create 2 food cells for every 5 foods eaten
+        createFood(foodsEaten % 5 == 0 ? 2 : 1);
 
         // Increase move time
         if (moveTimeMS > MIN_MOVE_TIME_MS) {
-            moveTimeMS -= 15;
+            moveTimeMS -= MOVE_TIME_DECREASE_MS;
         }
     }
 
