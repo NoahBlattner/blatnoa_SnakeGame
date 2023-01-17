@@ -115,7 +115,7 @@ public class Snake implements Tickable {
 
     }
 
-    private Activity activity;
+    private SnakeActivity snakeActivity;
     private GridLayout grid;
 
     private SnakeAdapter adapter;
@@ -138,7 +138,7 @@ public class Snake implements Tickable {
      */
     public Snake(GridLayout playingFieldGrid) {
         this.grid = playingFieldGrid;
-        activity = (Activity) grid.getContext();
+        snakeActivity = (SnakeActivity) grid.getContext();
 
         // Bind to adapter
         adapter = new SnakeAdapter(grid);
@@ -282,8 +282,10 @@ public class Snake implements Tickable {
         adapter.updateSnakeOnMove(head, new ArrayList<>(bodyCells));
     }
 
+    /**
+     * End the game
+     */
     private void gameOver() {
-        SnakeActivity snakeActivity = (SnakeActivity) activity;
         snakeActivity.gameOver();
     }
 
@@ -292,6 +294,10 @@ public class Snake implements Tickable {
      */
     private void onEatFood() {
         foodsEaten++;
+
+        // Update the score in the activity
+        snakeActivity.updateScore(foodsEaten);
+
         // Remove food
         foodCells.remove(0);
 

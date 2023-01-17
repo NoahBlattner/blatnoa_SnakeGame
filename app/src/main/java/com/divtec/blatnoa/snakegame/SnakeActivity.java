@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
@@ -22,6 +23,8 @@ public class SnakeActivity extends AppCompatActivity {
     private ConstraintLayout lyt;
     private Button restartButton;
     private GridLayout grid;
+    private TextView scoreText;
+
     private Snake snake;
 
     private SensorManager sensorManager;
@@ -42,6 +45,10 @@ public class SnakeActivity extends AppCompatActivity {
         lyt = findViewById(R.id.layout);
         grid = findViewById(R.id.cellGrid);
         restartButton = findViewById(R.id.restartButton);
+        scoreText = findViewById(R.id.scoreText);
+
+        // Set text to 0
+        scoreText.setText("0");
 
         // Set up button listener
         restartButton.setOnClickListener(view -> {
@@ -71,8 +78,8 @@ public class SnakeActivity extends AppCompatActivity {
                 float absY = Math.abs(y);
                 float maxAbs = Math.max(absX, absY);
 
-                // If the highest reading is below 0.5, ignore
-                if (maxAbs < 1.5) {
+                // If the highest reading is below 2.5, ignore
+                if (maxAbs < 2.5) {
                     return;
                 }
 
@@ -176,6 +183,14 @@ public class SnakeActivity extends AppCompatActivity {
             cell.setBackgroundColor(0);
         }
         TickManager.getTickManager().stop();
+    }
+
+    /**
+     * Updates the score
+     * @param score The new score
+     */
+    public void updateScore(int score) {
+        runOnUiThread(() -> scoreText.setText(Integer.toString(score)));
     }
 
     @Override
