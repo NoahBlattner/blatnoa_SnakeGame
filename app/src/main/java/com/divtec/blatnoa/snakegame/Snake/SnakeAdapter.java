@@ -14,66 +14,131 @@ public class SnakeAdapter {
     private final GridLayout grid;
     private final Activity activity;
 
-    private Snake snake;
-    private Snake.GameCell prevHead;
-    private Snake.GameCell prevLastBody;
-    private ArrayList<Snake.GameCell> prevFoods = new ArrayList<>();
+    private Snake.GameCell prevHeadCell;
+    private Snake.GameCell prevFirstBodyCell;
+    private Snake.GameCell prevLastBodyCell;
 
-    public SnakeAdapter(Snake snake) {
-        this.snake = snake;
-        this.grid = snake.getGrid();
+    public SnakeAdapter(GridLayout grid) {
+        this.grid = grid;
         activity = (Activity) grid.getContext();
     }
 
-    public void updateGrid(Snake.GameCell head, Snake.GameCell newBody, ArrayList<Snake.GameCell> foods) {
+    /**
+     * Update the snake in the grid when it moves
+     * @param head The new head cell
+     * @param bodies The body cells
+     */
+    public void updateSnakeOnMove(Snake.GameCell head, ArrayList<Snake.GameCell> bodies) {
         activity.runOnUiThread(() -> {
-            // Remove old head
-            if (prevHead != null) {
-                ImageView prevHeadView = (ImageView) grid.getChildAt(coordToIndex(prevHead.x, prevHead.y));
-                prevHeadView.setImageResource(0);
+
+            // Remove the tail if the snake is not growing
+            if (prevLastBodyCell != null && !bodies.contains(prevLastBodyCell)) {
+                // Get the image view
+                ImageView tailView = (ImageView) grid.getChildAt(coordToIndex(prevLastBodyCell.x, prevLastBodyCell.y));
+
+                // Remove the tail
+                tailView.setImageResource(0);
             }
 
-            // Remove old bodies
-            if (prevLastBody != null) {
-                ImageView prevBodyView = (ImageView) grid.getChildAt(coordToIndex(prevLastBody.x, prevLastBody.y));
-                prevBodyView.setImageResource(0);
-            }
+            // Get the image view
+            ImageView bodyView = (ImageView) grid.getChildAt(coordToIndex(prevHeadCell.x, prevHeadCell.y));
 
-            // Add new head
-            if (!head.equals(prevHead)) {
-                ImageView headView = (ImageView) grid.getChildAt(coordToIndex(head.x, head.y));
-                headView.setImageResource(R.drawable.snake_head);
-                headView.setRotation(head.direction.rotation);
-                prevHead = head;
-            }
+            if (!bodies.isEmpty()) { // If the snake has bodies
 
-            // Add new bodies
-            if (newBody != null) {
-                ImageView bodyView = (ImageView) grid.getChildAt(coordToIndex(newBody.x, newBody.y));
+                Snake.GameCell firstBody = bodies.get(bodies.size() - 1);
 
-                if (newBody.direction == prevLastBody.direction || prevLastBody == null) {
+                // Place body at previous head
+                // Check if the snake is turning
+                if (prevFirstBodyCell == null || firstBody.direction == prevFirstBodyCell.direction) { // If not turning
+                    // Place straight body
                     bodyView.setImageResource(R.drawable.snake_body);
-                } else {
-                    bodyView.setImageResource(R.drawable.snake_corner);
-                }
-                bodyView.setRotation(newBody.direction.rotation);
-
-                prevLastBody = snake.getBodyCells().get(0);
-            }
-
-            // Add new foods
-            if (foods != null) {
-                for (Snake.GameCell food : foods) {
-                    if (!prevFoods.contains(food)) {
-                        ImageView foodView = (ImageView) grid.getChildAt(coordToIndex(food.x, food.y));
-                        foodView.setImageResource(R.drawable.apple);
+                    // Rotate the image view
+                    bodyView.setRotation(firstBody.direction.rotation);
+                } else { // If turning
+                    if (prevFirstBodyCell.direction.getTurn(firstBody.direction) == Snake.Direction.LEFT) { // If turning left
+                        bodyView.setImageResource(R.drawable.snake_corner);
+                    } else { // If turning right
+                        bodyView.setImageResource(R.drawable.snake_corner_inverted);
                     }
+                    // Place turning body
+                    bodyView.setRotation(firstBody.direction.rotation);
                 }
-                prevFoods = foods;
+
+                prevFirstBodyCell = firstBody;
+
+                // Remember last body
+                prevLastBodyCell = bodies.get(0);
+            } else { // If snake is only head
+                // Clear the previous head position
+                bodyView.setImageResource(0);
             }
+
+            // Place the head
+            placeHead(head);
         });
     }
 
+    /**
+     * Regenerates the foods in the grid
+     * @param foods The foods cells
+     */
+    public void updateFood(ArrayList<Snake.GameCell> foods) {
+        activity.runOnUiThread(() -> {
+            placeApples(foods);
+        });
+    }
+
+    /**
+     * Initialize the grid with the snake and the foods
+     * @param head The head cell
+     * @param foods The food cells
+     */
+    public void initGrid(Snake.GameCell head, ArrayList<Snake.GameCell> foods) {
+        activity.runOnUiThread(() -> {
+            // Clear grid
+            for (int i = 0; i < grid.getChildCount(); i++) {
+                ImageView view = (ImageView) grid.getChildAt(i);
+                view.setImageResource(0);
+            }
+
+            // Add head
+            placeHead(head);
+
+            // Add foods
+            placeApples(foods);
+        });
+    }
+
+    /**
+     * Place the head in the grid
+     * @param head The head cell
+     */
+    private void placeHead(Snake.GameCell head) {
+        ImageView headView = (ImageView) grid.getChildAt(coordToIndex(head.x, head.y));
+        headView.setImageResource(R.drawable.snake_head);
+        headView.setRotation(head.direction.rotation);
+        prevHeadCell = head;
+    }
+
+    /**
+     * Place the foods in the grid
+     * @param foods The food cells
+     */
+    private void placeApples(ArrayList<Snake.GameCell> foods) {
+        // Add foods
+        for (Snake.GameCell food : foods) {
+            ImageView foodView = (ImageView) grid.getChildAt(coordToIndex(food.x, food.y));
+            foodView.setImageResource(R.drawable.apple);
+            foodView.setRotation(0);
+        }
+    }
+
+    /**
+     * Convert the coordinates to the index in the grid
+     * @param x The x coordinate
+     * @param y The y coordinate
+     * @return The index corresponding to the coordinates
+     */
     private int coordToIndex(int x, int y) {
         return x + y * grid.getColumnCount();
     }

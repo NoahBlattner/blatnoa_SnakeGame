@@ -22,11 +22,6 @@ public class Snake implements Tickable {
             this.direction = direction;
         }
 
-        public GameCell(int x, int y, boolean isFood) {
-            this.x = x;
-            this.y = y;
-        }
-
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof GameCell) {
@@ -83,6 +78,38 @@ public class Snake implements Tickable {
         public boolean isOpposite(Direction other) {
             return this.opposite() == other;
         }
+
+        public Direction getTurn(Direction other) {
+            if (this == other) {
+                return this;
+            }
+            if (this == UP) {
+                if (other == LEFT) {
+                    return LEFT;
+                } else if (other == RIGHT) {
+                    return RIGHT;
+                }
+            } else if (this == DOWN) {
+                if (other == LEFT) {
+                    return RIGHT;
+                } else if (other == RIGHT) {
+                    return LEFT;
+                }
+            } else if (this == LEFT) {
+                if (other == UP) {
+                    return RIGHT;
+                } else if (other == DOWN) {
+                    return LEFT;
+                }
+            } else if (this == RIGHT) {
+                if (other == UP) {
+                    return LEFT;
+                } else if (other == DOWN) {
+                    return RIGHT;
+                }
+            }
+            return NONE;
+        }
     }
 
     private GridLayout grid;
@@ -92,6 +119,7 @@ public class Snake implements Tickable {
     private GameCell head;
     private final ArrayList<GameCell> foodCells = new ArrayList<>();
 
+    private Direction currentDirection = Direction.NONE;
     private Direction nextDirection = Direction.RIGHT;
 
     private final int MIN_MOVE_TIME_MS = 100;
@@ -106,7 +134,7 @@ public class Snake implements Tickable {
         this.grid = playingFieldGrid;
 
         // Bind to adapter
-        adapter = new SnakeAdapter(this);
+        adapter = new SnakeAdapter(grid);
 
         TickManager.getTickManager().addTickObject(this);
 
@@ -120,29 +148,47 @@ public class Snake implements Tickable {
         ImageView centerImage = (ImageView) grid.getChildAt(x + y * grid.getColumnCount());
         centerImage.setImageResource(R.drawable.snake_head);
 
-        createFood();
+        createFood(1);
 
-        adapter.updateGrid(head, null, foodCells);
+        adapter.initGrid(head, foodCells);
     }
 
+    /**
+     * Turn the snake if it is not turning in the opposite direction
+     * @param newDirection The new direction to turn to
+     */
     public void turn(Direction newDirection) {
-        if (!nextDirection.isOpposite(newDirection)) {
+        if (!currentDirection.isOpposite(newDirection)) {
             nextDirection = newDirection;
         }
     }
 
-    private void createFood() {
-        // Create food
-        int randX;
-        int randY;
-        do {
-            randX = (int) (Math.random() * grid.getColumnCount());
-            randY = (int) (Math.random() * grid.getRowCount());
-        } while (!positionValid(randX, randY));
+    /**
+     * Create new food cells
+     * @param numberOfFood The number of food cells to create
+     */
+    private void createFood(int numberOfFood) {
+        for (int i = 0; i < numberOfFood; i++) {
+            // Create food
+            int randX;
+            int randY;
+            do {
+                randX = (int) (Math.random() * grid.getColumnCount());
+                randY = (int) (Math.random() * grid.getRowCount());
+            } while (!positionValid(randX, randY));
 
-        foodCells.add(new GameCell(randX, randY, null));
+            foodCells.add(new GameCell(randX, randY, null));
+        }
+
+        adapter.updateFood(foodCells);
     }
 
+    /**
+     * Check if the position is valid (not occupied by snake and in bounds)
+     * @param x The x position
+     * @param y The y position
+     * @return True if the position is valid (not occupied by snake and in bounds)
+     */
     private boolean positionValid(int x, int y) {
         if (x < 0 || x >= grid.getColumnCount() || y < 0 || y >= grid.getRowCount()) {
             return false;
@@ -160,6 +206,12 @@ public class Snake implements Tickable {
         return true;
     }
 
+    /**
+     * Check if the position contains food
+     * @param x The x position
+     * @param y The y position
+     * @return True if the position contains food
+     */
     private boolean isFoodCell(int x, int y) {
         for (GameCell cell : foodCells) {
             if (cell.x == x && cell.y == y) {
@@ -169,6 +221,9 @@ public class Snake implements Tickable {
         return false;
     }
 
+    /**
+     * Move the snake by 1 cell
+     */
     private void move() {
         // Move head
         int newX = head.x;
@@ -188,50 +243,52 @@ public class Snake implements Tickable {
                 break;
         }
 
-        boolean removeTail = true;
-        if (isFoodCell(newX, newY)) { // If new position is food
-            // Don't remove tail
-            removeTail = false;
-            onEatFood();
-        } else if (!positionValid(newX, newY)) { // Check if new position is out of bounds
+        // Update direction
+        currentDirection = nextDirection;
+
+        if (!positionValid(newX, newY)) { // If new position isn't free
+            // Game over
             System.out.println("Game over");
             return;
+        }
+
+        boolean hasEaten = false;
+        if (isFoodCell(newX, newY)) { // If new position is food
+            hasEaten = true;
+            onEatFood();
+        }
+
+        if (bodyCells.size() > 0 || hasEaten) { // If has body or has eaten
+            // Place first body cell at old head position
+            bodyCells.add(new GameCell(head.x, head.y, nextDirection));
+        }
+
+        if (!hasEaten && bodyCells.size() > 0) { // If snake hasn't eaten and has body
+            // Remove last body cell
+            bodyCells.remove(0);
         }
 
         // Move head
         head = new GameCell(newX, newY, nextDirection);
 
-        // Add new body
-        GameCell firstBodyCell = new GameCell(head.x, head.y, nextDirection);
-        bodyCells.add(firstBodyCell);
-        if (removeTail) { // If not eating food
-            // Remove last body
-            bodyCells.remove(0);
-        }
-
         // Update grid
-        adapter.updateGrid(head, firstBodyCell, foodCells);
+        adapter.updateSnakeOnMove(head, new ArrayList<>(bodyCells));
     }
 
+    /**
+     * Called when the snake eats food
+     */
     private void onEatFood() {
         // Remove food
         foodCells.remove(0);
 
         // Create new food
-        createFood();
+        createFood(1);
 
         // Increase move time
         if (moveTimeMS > MIN_MOVE_TIME_MS) {
             moveTimeMS -= 15;
         }
-    }
-
-    public ArrayList<GameCell> getBodyCells() {
-        return bodyCells;
-    }
-
-    public GridLayout getGrid() {
-        return grid;
     }
 
     @Override

@@ -141,10 +141,29 @@ public class SnakeActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Starts the game
+     */
     private void startGame() {
         // Register the listener
         sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         TickManager.getTickManager().start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Unregister the listener
+        sensorManager.unregisterListener(acceleroListener);
+        TickManager.getTickManager().pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Register the listener
+        sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        TickManager.getTickManager().resume();
     }
 
     @Override
