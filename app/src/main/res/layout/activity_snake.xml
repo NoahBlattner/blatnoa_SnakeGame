@@ -27,7 +27,7 @@
             android:textSize="24sp"/>
 
         <Button
-            android:id="@+id/reset"
+            android:id="@+id/restartButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/bt_reset"/>

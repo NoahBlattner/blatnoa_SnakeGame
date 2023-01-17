@@ -8,6 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
@@ -19,6 +20,7 @@ public class SnakeActivity extends AppCompatActivity {
     private final int CELL_COLUMN_COUNT = 15;
 
     private ConstraintLayout lyt;
+    private Button restartButton;
     private GridLayout grid;
     private Snake snake;
 
@@ -39,6 +41,13 @@ public class SnakeActivity extends AppCompatActivity {
         // Get components
         lyt = findViewById(R.id.layout);
         grid = findViewById(R.id.cellGrid);
+        restartButton = findViewById(R.id.restartButton);
+
+        // Set up button listener
+        restartButton.setOnClickListener(view -> {
+            // Restart activity
+            recreate();
+        });
 
         // Get sensor manager and from it the rotation sensor
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -162,7 +171,11 @@ public class SnakeActivity extends AppCompatActivity {
      * End snake game
      */
     public void gameOver() {
-        grid.removeAllViews();
+        for (int i = 0; i < grid.getChildCount(); i++) {
+            ImageView cell = (ImageView) grid.getChildAt(i);
+            cell.setBackgroundColor(0);
+        }
+        TickManager.getTickManager().stop();
     }
 
     @Override

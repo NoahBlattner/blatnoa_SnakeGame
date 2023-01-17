@@ -56,9 +56,9 @@ public class SnakeAdapter {
                     bodyView.setRotation(firstBody.direction.rotation);
                 } else { // If turning
                     if (prevFirstBodyCell.direction.getTurn(firstBody.direction) == Snake.Direction.LEFT) { // If turning left
-                        bodyView.setImageResource(R.drawable.snake_corner);
+                        bodyView.setImageResource(R.drawable.snake_corner_left);
                     } else { // If turning right
-                        bodyView.setImageResource(R.drawable.snake_corner_inverted);
+                        bodyView.setImageResource(R.drawable.snake_corner_right);
                     }
                     // Place turning body
                     bodyView.setRotation(firstBody.direction.rotation);
