@@ -124,7 +124,7 @@ public class Snake implements Tickable {
     private Direction nextDirection = Direction.RIGHT;
 
     private final int MIN_MOVE_TIME_MS = 100;
-    public static final int MOVE_TIME_DECREASE_MS = 15;
+    public static final int MOVE_TIME_DECREASE_MS = 25;
     private int moveTimeMS = 1000;
     private int timeSinceLastMove = 0;
     private int foodsEaten = 0;

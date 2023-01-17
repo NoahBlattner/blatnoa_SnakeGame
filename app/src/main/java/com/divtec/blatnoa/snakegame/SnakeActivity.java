@@ -12,7 +12,6 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
-import com.divtec.blatnoa.snakegame.Snake.SnakeAdapter;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
 
 public class SnakeActivity extends AppCompatActivity {
@@ -26,6 +25,8 @@ public class SnakeActivity extends AppCompatActivity {
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private SensorEventListener acceleroListener;
+
+    private boolean hasStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,12 @@ public class SnakeActivity extends AppCompatActivity {
         acceleroListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(android.hardware.SensorEvent event) {
+                // If the game has not started
+                if (!hasStarted) {
+                    // Ignore the event
+                    return;
+                }
+
                 // Get highest reading above 0.5
                 float x = event.values[0];
                 float y = event.values[1];
@@ -147,6 +154,7 @@ public class SnakeActivity extends AppCompatActivity {
     private void startGame() {
         // Register the listener
         sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        hasStarted = true;
         TickManager.getTickManager().start();
     }
 
