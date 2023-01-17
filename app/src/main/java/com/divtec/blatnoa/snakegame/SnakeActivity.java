@@ -192,11 +192,12 @@ public class SnakeActivity extends AppCompatActivity {
         // Register the listener
         sensorManager.registerListener(acceleroListener, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         TickManager.getTickManager().resume();
+
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         // Unregister the listener
         sensorManager.unregisterListener(acceleroListener);
         TickManager.getTickManager().stop();

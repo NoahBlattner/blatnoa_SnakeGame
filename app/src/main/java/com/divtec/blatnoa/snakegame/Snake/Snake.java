@@ -155,7 +155,7 @@ public class Snake implements Tickable {
         ImageView centerImage = (ImageView) grid.getChildAt(x + y * grid.getColumnCount());
         centerImage.setImageResource(R.drawable.snake_head);
 
-        createFood(2);
+        createFood(1);
 
         adapter.initGrid(head, foodCells);
     }
