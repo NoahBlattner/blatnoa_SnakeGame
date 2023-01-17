@@ -116,8 +116,8 @@ public class SnakeActivity extends AppCompatActivity {
         if (grid.getChildCount() == 0) {
 
             // Get layout size
-            int width = lyt.getWidth();
-            int height = lyt.getHeight();
+            int width = grid.getWidth();
+            int height = grid.getHeight();
 
             // Get cell size
             int cellSize = width / CELL_COLUMN_COUNT;
