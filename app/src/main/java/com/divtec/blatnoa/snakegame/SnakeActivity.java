@@ -158,6 +158,13 @@ public class SnakeActivity extends AppCompatActivity {
         TickManager.getTickManager().start();
     }
 
+    /**
+     * End snake game
+     */
+    public void gameOver() {
+        grid.removeAllViews();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();

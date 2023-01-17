@@ -70,6 +70,10 @@ public class TickManager implements Runnable {
      * Starts the tick thread
      */
     public void start() {
+        if (tickThread != null) {
+            throw new TickThreadAlreadyRunningException();
+        }
+
         if (threadState == ThreadState.UNINITIALIZED || threadState == ThreadState.STOPPED) {
             threadState = ThreadState.RUNNING;
 
@@ -101,6 +105,7 @@ public class TickManager implements Runnable {
     public void stop() {
         if (threadState == ThreadState.RUNNING || threadState == ThreadState.PAUSED) {
             threadState = ThreadState.STOPPED;
+            tickThread = null;
             tickables.clear();
         }
     }

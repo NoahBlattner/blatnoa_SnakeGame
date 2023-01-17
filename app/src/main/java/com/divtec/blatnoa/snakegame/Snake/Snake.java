@@ -1,9 +1,11 @@
 package com.divtec.blatnoa.snakegame.Snake;
 
+import android.app.Activity;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.divtec.blatnoa.snakegame.R;
+import com.divtec.blatnoa.snakegame.SnakeActivity;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
 import com.divtec.blatnoa.snakegame.Tick.Tickable;
 
@@ -113,6 +115,7 @@ public class Snake implements Tickable {
 
     }
 
+    private Activity activity;
     private GridLayout grid;
 
     private SnakeAdapter adapter;
@@ -135,6 +138,7 @@ public class Snake implements Tickable {
      */
     public Snake(GridLayout playingFieldGrid) {
         this.grid = playingFieldGrid;
+        activity = (Activity) grid.getContext();
 
         // Bind to adapter
         adapter = new SnakeAdapter(grid);
@@ -251,7 +255,7 @@ public class Snake implements Tickable {
 
         if (!positionValid(newX, newY)) { // If new position isn't free
             // Game over
-            System.out.println("Game over");
+            gameOver();
             return;
         }
 
@@ -276,6 +280,11 @@ public class Snake implements Tickable {
 
         // Update grid
         adapter.updateSnakeOnMove(head, new ArrayList<>(bodyCells));
+    }
+
+    private void gameOver() {
+        SnakeActivity snakeActivity = (SnakeActivity) activity;
+        snakeActivity.gameOver();
     }
 
     /**

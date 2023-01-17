@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SnakeGame</string>
+    <string name="txt_game_over">Game Over</string>
+    <string name="bt_reset">Reset</string>
+    <string name="bt_physics_test">Physics Test</string>
+    <string name="bt_snake_game">Snake Game</string>
 </resources>
