@@ -16,4 +16,6 @@
     <string name="final_score_text">Your final score is :</string>
     <string name="bt_save_score">Save</string>
     <string name="txt_name">Your name</string>
+    <string name="name_too_short">Name must be at least 3 characters long</string>
+    <string name="score_saved">Saved !</string>
 </resources>

@@ -14,17 +14,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
+import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Controllers.ScoreManager;
+import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Models.Score;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class SnakeActivity extends AppCompatActivity {
 
     private final int CELL_COLUMN_COUNT = 15;
 
     private ConstraintLayout lyt;
-    private Button saveScoreButton;
+    private MaterialButton saveScoreButton;
     private Button restartButton;
+    private Button quitButton;
     private GridLayout grid;
     private TextView currentScoreText;
+    private TextInputEditText playerNameText;
 
     private Snake snake;
 
@@ -48,19 +54,39 @@ public class SnakeActivity extends AppCompatActivity {
         saveScoreButton = findViewById(R.id.bt_save_score);
         restartButton = findViewById(R.id.bt_restart);
         currentScoreText = findViewById(R.id.txt_current_score);
+        playerNameText = findViewById(R.id.txt_player_name);
+        quitButton = findViewById(R.id.bt_quit);
 
         // Set text to 0
         currentScoreText.setText("0");
 
         // Set up button listeners
         saveScoreButton.setOnClickListener(v -> {
-           // Save to sqlite
-            // TODO : Save to sqlite
+            // If the player name is not too short
+            if (playerNameText.getText().length() < 3) {
+                playerNameText.setError(getString(R.string.name_too_short));
+                playerNameText.requestFocus();
+            } else {
+                // Save to sqlite
+                saveScore(playerNameText.getText().toString(), Integer.parseInt(currentScoreText.getText().toString()));
+                // Disable the button and set text to "Saved"
+                saveScoreButton.setEnabled(false);
+                saveScoreButton.setAlpha(.5f);
+                saveScoreButton.setText(R.string.score_saved);
+
+                // Lock the text field
+                playerNameText.setEnabled(false);
+            }
         });
 
         restartButton.setOnClickListener(view -> {
             // Restart activity
             recreate();
+        });
+
+        quitButton.setOnClickListener(view -> {
+            // Quit activity
+            finish();
         });
 
         // Get sensor manager and from it the rotation sensor
@@ -114,6 +140,19 @@ public class SnakeActivity extends AppCompatActivity {
 
         // Generate the grid when layout is ready
         lyt.getViewTreeObserver().addOnGlobalLayoutListener(this::prepareLayout);
+    }
+
+    /**
+     * Save the score to the database
+     * @param playerName The name of the player
+     * @param score The score of the player
+     */
+    private void saveScore(String playerName, int score) {
+        ScoreManager scoreManager = new ScoreManager(this);
+
+        // TODO Add toasts to indicate success or failure
+        scoreManager.addScore(playerName, score);
+        System.out.println(scoreManager.getScores());
     }
 
     /**

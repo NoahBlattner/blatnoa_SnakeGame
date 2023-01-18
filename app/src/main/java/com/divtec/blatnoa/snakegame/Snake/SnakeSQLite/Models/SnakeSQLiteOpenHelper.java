@@ -24,6 +24,14 @@ public class SnakeSQLiteOpenHelper extends SQLiteOpenHelper {
      * @return
      */
     public boolean addScore(String player, int score) {
+        int lowestScore = getLowestScore();
+
+        // If the new score is lower than the lowest score
+        if (score < lowestScore) {
+            // Don't add it
+            return false;
+        }
+
         // If the row count is 10
         if (getRowCount() >= 10) {
             // Delete the lowest score
@@ -32,11 +40,25 @@ public class SnakeSQLiteOpenHelper extends SQLiteOpenHelper {
 
         try {
             // Insert the new score
-            getWritableDatabase().execSQL("INSERT INTO tb_snakeScores(score) VALUES(" + player + ", " + score + ");");
+            getWritableDatabase().execSQL("INSERT INTO tb_snakeScores(player, score) VALUES('" + player + "', " + score + ");");
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Get the lowest score
+     * @return The lowest score
+     */
+    private int getLowestScore() {
+        // Get the lowest score
+        Cursor cursor = getReadableDatabase().rawQuery("SELECT MIN(score) FROM tb_snakeScores", null);
+        cursor.moveToFirst();
+        int lowestScore = cursor.getInt(0);
+        cursor.close();
+
+        return lowestScore;
     }
 
     /**

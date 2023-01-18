@@ -108,7 +108,7 @@
             android:hint="@string/txt_name">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/txt_name"
+                android:id="@+id/txt_player_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 />
@@ -146,7 +146,7 @@
 
             <Button
                 style="@style/Widget.Material3.Button.ElevatedButton"
-                android:id="@+id/quitButton"
+                android:id="@+id/bt_quit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/red"

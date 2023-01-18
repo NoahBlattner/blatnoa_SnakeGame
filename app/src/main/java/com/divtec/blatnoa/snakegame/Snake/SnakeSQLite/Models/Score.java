@@ -2,6 +2,8 @@ package com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Models;
 
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
+
 public class Score {
 
     private String player;
@@ -18,5 +20,11 @@ public class Score {
 
     public int getScore() {
         return score;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return player + " : " + score;
     }
 }
