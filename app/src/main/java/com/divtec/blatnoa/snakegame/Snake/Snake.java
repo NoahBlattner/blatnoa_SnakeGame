@@ -176,7 +176,6 @@ public class Snake implements Tickable {
      */
     private void createFood(int numberOfFood) {
         ArrayList<GameCell> emptyCells = new ArrayList<>();
-        String test = "";
 
         // Get all empty cells
         for (int x = 0; x < grid.getColumnCount(); x++) {
@@ -184,13 +183,6 @@ public class Snake implements Tickable {
                 GameCell cell = new GameCell(x, y, Direction.NONE);
                 if (positionValid(x, y) && !foodCells.contains(cell)) {
                     emptyCells.add(cell);
-                } else {
-                    if (bodyCells.contains(cell))
-                        test += "Body | ";
-                    if (foodCells.contains(cell))
-                        test += "Food | ";
-                    if (cell.equals(head))
-                        test += "Head | ";
                 }
             }
         }

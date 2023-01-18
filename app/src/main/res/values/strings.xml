@@ -1,9 +1,19 @@
 <resources>
     <string name="app_name">SnakeGame</string>
-    <string name="txt_game_over">Game Over</string>
-    <string name="bt_reset">Reset</string>
+
+    <!-- Menu -->
     <string name="bt_physics_test">Physics Test</string>
     <string name="bt_snake_game">Snake Game</string>
-    <string name="bt_quit">Quit</string>
+
+    <!-- Snake Game -->
     <string name="score">Score:</string>
+    <string name="txt_game_over">Game Over</string>
+    <string name="bt_restart">Reset</string>
+    <string name="bt_quit">Quit</string>
+
+    <!-- Leaderboard dialog -->
+    <string name="leaderboard_dialog_title">Save your score to the leaderboard :</string>
+    <string name="final_score_text">Your final score is :</string>
+    <string name="bt_save_score">Save</string>
+    <string name="txt_name">Your name</string>
 </resources>

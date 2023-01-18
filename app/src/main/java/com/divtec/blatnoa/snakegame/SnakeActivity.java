@@ -21,9 +21,10 @@ public class SnakeActivity extends AppCompatActivity {
     private final int CELL_COLUMN_COUNT = 15;
 
     private ConstraintLayout lyt;
+    private Button saveScoreButton;
     private Button restartButton;
     private GridLayout grid;
-    private TextView scoreText;
+    private TextView currentScoreText;
 
     private Snake snake;
 
@@ -44,13 +45,19 @@ public class SnakeActivity extends AppCompatActivity {
         // Get components
         lyt = findViewById(R.id.layout);
         grid = findViewById(R.id.cellGrid);
-        restartButton = findViewById(R.id.restartButton);
-        scoreText = findViewById(R.id.scoreText);
+        saveScoreButton = findViewById(R.id.bt_save_score);
+        restartButton = findViewById(R.id.bt_restart);
+        currentScoreText = findViewById(R.id.txt_current_score);
 
         // Set text to 0
-        scoreText.setText("0");
+        currentScoreText.setText("0");
 
-        // Set up button listener
+        // Set up button listeners
+        saveScoreButton.setOnClickListener(v -> {
+           // Save to sqlite
+            // TODO : Save to sqlite
+        });
+
         restartButton.setOnClickListener(view -> {
             // Restart activity
             recreate();
@@ -178,11 +185,22 @@ public class SnakeActivity extends AppCompatActivity {
      * End snake game
      */
     public void gameOver() {
+        // Update final score
+        TextView finalScoreText = findViewById(R.id.txt_final_score);
+
+        runOnUiThread(() -> {
+            finalScoreText.setText(currentScoreText.getText());
+        });
+
+        // Move grid to the background
         grid.setTranslationZ(-5);
+        // Remove cell backgrounds
         for (int i = 0; i < grid.getChildCount(); i++) {
             ImageView cell = (ImageView) grid.getChildAt(i);
             cell.setBackgroundColor(0);
         }
+
+        // Stop the tick manager
         TickManager.getTickManager().stop();
     }
 
@@ -192,14 +210,7 @@ public class SnakeActivity extends AppCompatActivity {
      */
     public void updateScore(int score) {
         runOnUiThread(() -> {
-            String baseText = Integer.toString(score);
-            StringBuilder finalText = new StringBuilder("Score:");
-
-            for (int i = 0; i < baseText.length(); i++) {
-                finalText.append(baseText.charAt(i)).append("/n");
-            }
-
-            scoreText.setText(finalText);
+            currentScoreText.setText(Integer.toString(score));
         });
     }
 

@@ -8,7 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="red">#FFFF0000</color>
+    <color name="red">#E80909</color>
+    <color name="death_screen">#A83838</color>
+    <color name="bt_reset">#336717</color>
+    <color name="bt_save_score">#0073FF</color>
     <color name="cell1">#FF6ad859</color>
     <color name="cell2">#FF109235</color>
 </resources>
