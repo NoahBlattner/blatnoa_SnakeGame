@@ -32,28 +32,57 @@
             android:layout_height="wrap_content"
             android:text="@string/bt_reset"/>
 
+        <Button
+            android:id="@+id/quitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bt_quit"/>
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/scoreText"
+    <LinearLayout
+        android:id="@+id/scoreLayout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/cellGrid"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cellGrid"
+        android:orientation="vertical"
         android:gravity="center"
         android:background="@color/white"
-        android:text="3"
-        android:textSize="55dp"/>
+        >
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/white"
+            android:gravity="center"
+            android:rotation="90"
+            android:text="@string/score"
+            android:textSize="@dimen/score_text_size" />
+
+        <TextView
+            android:id="@+id/scoreText"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="25dp"
+            android:gravity="center"
+            android:rotation="90"
+            android:background="@color/white"
+            android:text="3"
+            android:textSize="@dimen/score_text_size" />
+
+    </LinearLayout>
 
     <GridLayout
         android:id="@+id/cellGrid"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:translationZ="5dp"
-        app:layout_constraintStart_toEndOf="@id/scoreText"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/scoreLayout"
         >
     </GridLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

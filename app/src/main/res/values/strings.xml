@@ -4,4 +4,6 @@
     <string name="bt_reset">Reset</string>
     <string name="bt_physics_test">Physics Test</string>
     <string name="bt_snake_game">Snake Game</string>
+    <string name="bt_quit">Quit</string>
+    <string name="score">Score:</string>
 </resources>

@@ -175,16 +175,33 @@ public class Snake implements Tickable {
      * @param numberOfFood The number of food cells to create
      */
     private void createFood(int numberOfFood) {
-        for (int i = 0; i < numberOfFood; i++) {
-            // Create food
-            int randX;
-            int randY;
-            do {
-                randX = (int) (Math.random() * grid.getColumnCount());
-                randY = (int) (Math.random() * grid.getRowCount());
-            } while (!positionValid(randX, randY));
+        ArrayList<GameCell> emptyCells = new ArrayList<>();
+        String test = "";
 
-            foodCells.add(new GameCell(randX, randY, null));
+        // Get all empty cells
+        for (int x = 0; x < grid.getColumnCount(); x++) {
+            for (int y = 0; y < grid.getRowCount(); y++) {
+                GameCell cell = new GameCell(x, y, Direction.NONE);
+                if (positionValid(x, y) && !foodCells.contains(cell)) {
+                    emptyCells.add(cell);
+                } else {
+                    if (bodyCells.contains(cell))
+                        test += "Body | ";
+                    if (foodCells.contains(cell))
+                        test += "Food | ";
+                    if (cell.equals(head))
+                        test += "Head | ";
+                }
+            }
+        }
+
+        // Create food cells
+        for (int i = 0; i < numberOfFood; i++) {
+            if (emptyCells.size() > 0) {
+                int index = (int) (Math.random() * emptyCells.size());
+                foodCells.add(emptyCells.get(index));
+                emptyCells.remove(index);
+            }
         }
 
         adapter.updateFood(foodCells);
@@ -298,12 +315,12 @@ public class Snake implements Tickable {
         // Update the score in the activity
         snakeActivity.updateScore(foodsEaten);
 
-        // Remove food
-        foodCells.remove(0);
-
         // Create new food
         // Create 2 food cells for every 5 foods eaten
         createFood(foodsEaten % 5 == 0 ? 2 : 1);
+
+        // Remove eaten food
+        foodCells.remove(0);
 
         // Increase move time
         if (moveTimeMS > MIN_MOVE_TIME_MS) {

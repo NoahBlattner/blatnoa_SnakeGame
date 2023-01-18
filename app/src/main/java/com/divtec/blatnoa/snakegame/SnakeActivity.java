@@ -178,6 +178,7 @@ public class SnakeActivity extends AppCompatActivity {
      * End snake game
      */
     public void gameOver() {
+        grid.setTranslationZ(-5);
         for (int i = 0; i < grid.getChildCount(); i++) {
             ImageView cell = (ImageView) grid.getChildAt(i);
             cell.setBackgroundColor(0);
@@ -190,7 +191,16 @@ public class SnakeActivity extends AppCompatActivity {
      * @param score The new score
      */
     public void updateScore(int score) {
-        runOnUiThread(() -> scoreText.setText(Integer.toString(score)));
+        runOnUiThread(() -> {
+            String baseText = Integer.toString(score);
+            StringBuilder finalText = new StringBuilder("Score:");
+
+            for (int i = 0; i < baseText.length(); i++) {
+                finalText.append(baseText.charAt(i)).append("/n");
+            }
+
+            scoreText.setText(finalText);
+        });
     }
 
     @Override
