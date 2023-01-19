@@ -15,22 +15,20 @@ public class SnakeSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS tb_snakeScores(idSnakeScore INTEGER PRIMARY KEY AUTOINCREMENT, player TEXT, score INTEGER);");
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS tb_snakeScores(" +
+                "idSnakeScore INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "player TEXT, " +
+                "score INTEGER, " +
+                "timeDate TEXT);");
     }
 
     /**
      * Add a score to the database
      * @param score The score to add
-     * @return
+     * @return True if the score was added, false otherwise
      */
     public boolean addScore(String player, int score) {
         int lowestScore = getLowestScore();
-
-        // If the new score is lower than the lowest score
-        if (score < lowestScore) {
-            // Don't add it
-            return false;
-        }
 
         // If the row count is 10
         if (getRowCount() >= 10) {
@@ -40,7 +38,8 @@ public class SnakeSQLiteOpenHelper extends SQLiteOpenHelper {
 
         try {
             // Insert the new score
-            getWritableDatabase().execSQL("INSERT INTO tb_snakeScores(player, score) VALUES('" + player + "', " + score + ");");
+            getWritableDatabase().execSQL("INSERT INTO tb_snakeScores(player, score, timeDate)" +
+                    " VALUES('" + player + "', " + score + ", dateTime('now'));");
             return true;
         } catch (Exception e) {
             return false;

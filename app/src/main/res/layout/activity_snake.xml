@@ -115,7 +115,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             style="@style/Widget.Material3.Button.ElevatedButton"
             android:id="@+id/bt_save_score"
             android:layout_width="wrap_content"
@@ -132,7 +132,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 style="@style/Widget.Material3.Button.ElevatedButton"
                 android:id="@+id/bt_restart"
                 android:layout_width="wrap_content"
@@ -144,7 +144,7 @@
                 app:iconTint="@color/white"
                 android:text="@string/bt_restart"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 style="@style/Widget.Material3.Button.ElevatedButton"
                 android:id="@+id/bt_quit"
                 android:layout_width="wrap_content"

@@ -8,10 +8,12 @@ public class Score {
 
     private String player;
     private int score;
+    private String timeDate;
 
     public Score(Cursor cursor) {
         player = cursor.getString(cursor.getColumnIndex("player"));
         score = cursor.getInt(cursor.getColumnIndex("score"));
+        timeDate = cursor.getString(cursor.getColumnIndex("timeDate"));
     }
 
     public String getPlayer() {
@@ -22,9 +24,13 @@ public class Score {
         return score;
     }
 
+    public String getTimeDate() {
+        return timeDate;
+    }
+
     @NonNull
     @Override
     public String toString() {
-        return player + " : " + score;
+        return player + " : " + score + " : " + timeDate;
     }
 }

@@ -27,7 +27,7 @@ public class ScoreManager {
     private ArrayList<Score> initScoreList() {
         // Get all the scores from the database into a cursor
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.query(true, "tb_snakeScores", new String[]{"player", "score"}, null, null, null, null, "score", null);
+        Cursor cursor = db.query(true, "tb_snakeScores", new String[]{"player", "score", "timeDate"}, null, null, null, null, "score", null);
 
         // Read the cursor
         ArrayList<Score> listScore = new ArrayList<>();
@@ -48,10 +48,7 @@ public class ScoreManager {
      * @return True if the score was added, false otherwise
      */
     public boolean addScore(String player, int score) {
-        if (helper.addScore(player, score)) {
-            return true;
-        }
-        return false;
+        return helper.addScore(player, score);
     }
 
     /**
@@ -63,6 +60,10 @@ public class ScoreManager {
             return true;
         }
         return false;
+    }
+
+    public Score getLowestScore() {
+        return scoreList.get(scoreList.size() - 1);
     }
 
     /**

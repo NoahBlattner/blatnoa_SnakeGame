@@ -18,4 +18,5 @@
     <string name="txt_name">Your name</string>
     <string name="name_too_short">Name must be at least 3 characters long</string>
     <string name="score_saved">Saved !</string>
+    <string name="score_too_low">Your score is not in the top 10</string>
 </resources>

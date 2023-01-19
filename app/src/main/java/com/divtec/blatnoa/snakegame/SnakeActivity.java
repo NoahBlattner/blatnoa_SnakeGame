@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
 import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Controllers.ScoreManager;
@@ -68,14 +69,18 @@ public class SnakeActivity extends AppCompatActivity {
                 playerNameText.requestFocus();
             } else {
                 // Save to sqlite
-                saveScore(playerNameText.getText().toString(), Integer.parseInt(currentScoreText.getText().toString()));
-                // Disable the button and set text to "Saved"
-                saveScoreButton.setEnabled(false);
-                saveScoreButton.setAlpha(.5f);
-                saveScoreButton.setText(R.string.score_saved);
+                ScoreManager scoreManager = new ScoreManager(this);
+                System.out.println(scoreManager.getScores());
+                if (saveScore(playerNameText.getText().toString(),
+                        Integer.parseInt(currentScoreText.getText().toString()))) { // If the score was saved
+                    // Disable the button and set text to "Saved"
+                    saveScoreButton.setEnabled(false);
+                    saveScoreButton.setAlpha(.5f);
+                    saveScoreButton.setText(R.string.score_saved);
 
-                // Lock the text field
-                playerNameText.setEnabled(false);
+                    // Lock the text field
+                    playerNameText.setEnabled(false);
+                }
             }
         });
 
@@ -147,12 +152,24 @@ public class SnakeActivity extends AppCompatActivity {
      * @param playerName The name of the player
      * @param score The score of the player
      */
-    private void saveScore(String playerName, int score) {
+    private boolean saveScore(String playerName, int score) {
         ScoreManager scoreManager = new ScoreManager(this);
 
-        // TODO Add toasts to indicate success or failure
-        scoreManager.addScore(playerName, score);
-        System.out.println(scoreManager.getScores());
+        if (scoreManager.getLowestScore().getScore() > score
+                && scoreManager.getScores().size() >= 10) { // If the score is lower than the 10th score
+            Toast.makeText(this, R.string.score_too_low, Toast.LENGTH_SHORT).show();
+
+            // Do not save
+            return false;
+        }
+
+        // Add the score to the database
+        if (!scoreManager.addScore(playerName, score)) { // If the score was not added
+            // Show a toast to inform the user
+            Toast.makeText(this, "Failed to save score", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
     /**
