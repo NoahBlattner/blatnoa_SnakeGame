@@ -10,8 +10,9 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button startPhysicsActivityButton;
-    Button startSnakeActivityButton;
+    private Button startPhysicsActivityButton;
+    private Button startSnakeActivityButton;
+    private Button startLeaderboardActivityButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +21,9 @@ public class MainActivity extends AppCompatActivity {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        startPhysicsActivityButton = findViewById(R.id.physicsActivityButton);
-        startSnakeActivityButton = findViewById(R.id.gameActivityButton);
+        startPhysicsActivityButton = findViewById(R.id.bt_physics_activity);
+        startSnakeActivityButton = findViewById(R.id.bt_game_activity);
+        startLeaderboardActivityButton = findViewById(R.id.bt_leaderboard_activity);
 
         startPhysicsActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,5 +40,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        startLeaderboardActivityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, LeaderboardActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 }
