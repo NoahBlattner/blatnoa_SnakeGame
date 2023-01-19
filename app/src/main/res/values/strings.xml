@@ -20,4 +20,5 @@
     <string name="score_saved">Saved !</string>
     <string name="score_too_low">Your score is not in the top 10</string>
     <string name="bt_leaderboard">Snake Leaderboard</string>
+    <string name="leaderboard_title">Snake Leaderboard</string>
 </resources>
