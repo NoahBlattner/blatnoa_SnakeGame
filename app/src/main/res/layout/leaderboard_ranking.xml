@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/main_spacing"
-    android:background="@drawable/border_all"
+    android:background="@drawable/border_bottom_horizontal"
     android:layout_weight="12">
 
     <TextView

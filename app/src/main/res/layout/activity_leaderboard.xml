@@ -13,6 +13,7 @@
         app:layout_constraintBottom_toTopOf="@id/list_leaderboard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/main_spacing"
         android:text="@string/leaderboard_title"
         android:textSize="@dimen/title_text_size"/>
 
@@ -34,7 +35,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="@dimen/main_spacing"
         android:text="@string/leaderboard_empty"
         android:textSize="@dimen/subtitle_text_size"/>
 

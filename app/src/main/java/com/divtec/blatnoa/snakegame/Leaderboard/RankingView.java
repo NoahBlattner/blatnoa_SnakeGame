@@ -40,7 +40,7 @@ public class RankingView extends RecyclerView.ViewHolder {
             timeDateTextView.setTypeface(null, Typeface.BOLD);
 
             // Set the background image
-            lyt.setBackgroundResource(R.drawable.border_top_horizontal);
+            lyt.setBackgroundResource(R.drawable.border_all);
 
             setData("Rank", "Name", "Score", "Date");
         }
