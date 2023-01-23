@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class LeaderboardActivity extends AppCompatActivity {
 
-    private final int MAX_RANKINGS = 10;
+    private final int MAX_RANKINGS = 20;
 
     private RecyclerView recyclerView;
     private TextView txtNoRankings;
