@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
 import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Controllers.RankingManager;
+import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Models.Ranking;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -153,14 +154,6 @@ public class SnakeActivity extends AppCompatActivity {
      */
     private boolean saveScore(String playerName, int score) {
         RankingManager scoreManager = new RankingManager(this);
-
-        if (scoreManager.getLowestRanking().getScore() > score
-                && scoreManager.getAllRankings().size() >= 10) { // If the score is lower than the 10th score
-            Toast.makeText(this, R.string.score_too_low, Toast.LENGTH_SHORT).show();
-
-            // Do not save
-            return false;
-        }
 
         // Add the score to the database
         if (!scoreManager.addRanking(playerName, score)) { // If the score was not added

@@ -27,24 +27,21 @@ public class RankingView extends RecyclerView.ViewHolder {
 
         rankingTextView = view.findViewById(R.id.txt_ranking);
         nameTextView = view.findViewById(R.id.txt_name);
-        scoreTextView = view.findViewById(R.id.txt_final_score);
+        scoreTextView = view.findViewById(R.id.txt_score);
         timeDateTextView = view.findViewById(R.id.txt_date);
 
         initComponent();
     }
 
     private void initComponent() {
-
+        // Set the style of the view
         if (isTitle) {
             rankingTextView.setTypeface(null, Typeface.BOLD);
             nameTextView.setTypeface(null, Typeface.BOLD);
             scoreTextView.setTypeface(null, Typeface.BOLD);
             timeDateTextView.setTypeface(null, Typeface.BOLD);
 
-            rankingTextView.setText("Ranking");
-            nameTextView.setText("Name");
-            scoreTextView.setText("Score");
-            timeDateTextView.setText("Date");
+            setData("Ranking", "Name", "Score", "Date");
         }
     }
 

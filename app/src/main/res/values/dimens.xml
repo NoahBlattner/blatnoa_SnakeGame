@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Text sizes -->
     <dimen name="title_text_size">35sp</dimen>
+    <dimen name="subtitle_text_size">20sp</dimen>
+
+    <!-- Spacing -->
     <dimen name="main_spacing">15dp</dimen>
     <dimen name="small_spacing">6dp</dimen>
 </resources>
