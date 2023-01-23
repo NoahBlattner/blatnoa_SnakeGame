@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 
 public class Ranking {
 
-    private int ranking;
     private String player;
     private int score;
     private String timeDate;
@@ -16,7 +15,6 @@ public class Ranking {
      * @param cursor Cursor containing the ranking data
      */
     public Ranking(Cursor cursor) {
-        ranking = cursor.getPosition() + 1;
 
         try {
             player = cursor.getString(cursor.getColumnIndexOrThrow("player"));
@@ -25,14 +23,6 @@ public class Ranking {
         } catch (IllegalArgumentException e) {
             throw new InvalidRankingCursor();
         }
-    }
-
-    /**
-     * Get the player's ranking
-     * @return The player's ranking
-     */
-    public int getRanking() {
-        return ranking;
     }
 
     /**
@@ -62,6 +52,6 @@ public class Ranking {
     @NonNull
     @Override
     public String toString() {
-        return ranking + " : " + player + " : " + score + " : " + timeDate;
+        return player + " : " + score + " : " + timeDate;
     }
 }

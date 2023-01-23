@@ -55,6 +55,13 @@ public class RankingView extends RecyclerView.ViewHolder {
         initComponent();
     }
 
+    /**
+     * Set the data of the view
+     * @param ranking The ranking
+     * @param name The name
+     * @param score The score
+     * @param timeDate The time and date
+     */
     public void setData(String ranking, String name, String score, String timeDate) {
         rankingTextView.setText(ranking);
         nameTextView.setText(name);

@@ -7,7 +7,7 @@
     <string name="bt_leaderboard">Classment de sepent</string>
 
     <!-- Snake Game -->
-    <string name="score">Points:</string>
+    <string name="score">Points :</string>
     <!-- Game Over -->
     <string name="txt_game_over">Perdu</string>
     <string name="txt_final_score">Vos points final sont :</string>
@@ -20,7 +20,7 @@
 
     <!-- Leaderboard -->
     <string name="txt_leaderboard_title">Classement Serpent</string>
-    <string name="txt_leaderboard_empty">le classement est vide</string>
+    <string name="txt_leaderboard_empty">Le classement est vide</string>
     <!-- Leaderboard Menu -->
     <string name="menu_clear_leaderboard">Vider le classement</string>
     <!-- Leaderboard Dialog -->

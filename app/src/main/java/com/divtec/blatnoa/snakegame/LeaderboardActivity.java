@@ -33,6 +33,14 @@ public class LeaderboardActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.list_leaderboard);
         txtNoRankings = findViewById(R.id.txt_empty_leaderboard);
 
+        // Load rankings
+        initList();
+    }
+
+    /**
+     * Initialize the list (or show a message if there are no rankings)
+     */
+    private void initList() {
         // Initialize the ranking manager
         RankingManager rankingManager = new RankingManager(this);
         ArrayList<Ranking> rankingList = rankingManager.getRankings(MAX_RANKINGS);
@@ -71,11 +79,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                         .setTitle(R.string.dialog_title_clear_leaderboard)
                         .setMessage(R.string.dialog_text_confirm)
                         .setPositiveButton(R.string.dialog_button_confirm, (dialog, which) -> {
-                            // Delete all the rankings from the database
-                            RankingManager rankingManager = new RankingManager(this);
-                            rankingManager.clearScores();
-                            // Refresh the recycler view
-                            recyclerView.setAdapter(new RankingAdapter(rankingManager.getRankings(MAX_RANKINGS)));
+                            initList();
                         })
                         .setNegativeButton(R.string.dialog_button_cancel, null)
                         .show();

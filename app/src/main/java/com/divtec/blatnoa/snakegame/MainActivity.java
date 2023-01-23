@@ -21,10 +21,12 @@ public class MainActivity extends AppCompatActivity {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        // Get views
         startPhysicsActivityButton = findViewById(R.id.bt_physics_activity);
         startSnakeActivityButton = findViewById(R.id.bt_game_activity);
         startLeaderboardActivityButton = findViewById(R.id.bt_leaderboard_activity);
 
+        // Set the button click listeners
         startPhysicsActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

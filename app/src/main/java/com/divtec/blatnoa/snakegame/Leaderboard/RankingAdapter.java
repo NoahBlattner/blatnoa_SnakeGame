@@ -41,7 +41,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingView> {
         Ranking ranking = rankingList.get(position-1);
 
         // Set the ranking data to the view
-        holder.setData(String.valueOf(ranking.getRanking()) + ".", ranking.getPlayer(), String.valueOf(ranking.getScore()), ranking.getTimeDate());
+        holder.setData(String.valueOf(position) + ".", ranking.getPlayer(), String.valueOf(ranking.getScore()), ranking.getTimeDate());
     }
 
     @Override
