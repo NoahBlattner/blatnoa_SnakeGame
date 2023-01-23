@@ -5,7 +5,7 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/death_screen"
+    android:background="@color/dark_red"
     tools:context=".SnakeActivity">
 
     <!-- Snake game grid -->
@@ -123,7 +123,7 @@
             android:textColor="@color/white"
             app:icon="@drawable/ic_outline_save_as_24"
             app:iconTint="@color/white"
-            android:backgroundTint="@color/bt_save_score"
+            android:backgroundTint="@color/blue"
             android:layout_marginBottom="@dimen/main_spacing"
             android:text="@string/bt_save_score"/>
 
@@ -137,7 +137,7 @@
                 android:id="@+id/bt_restart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/bt_reset"
+                android:backgroundTint="@color/color_primary"
                 android:textColor="@color/white"
                 android:layout_marginEnd="@dimen/main_spacing"
                 app:icon="@drawable/ic_baseline_refresh_24"

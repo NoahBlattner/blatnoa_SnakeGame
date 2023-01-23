@@ -21,19 +21,22 @@
         android:id="@+id/bt_physics_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/color_primary"
         android:text="@string/bt_physics_test" />
 
     <Button
         android:id="@+id/bt_game_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/color_secondary"
         android:text="@string/bt_snake_game" />
 
-        <Button
-            android:id="@+id/bt_leaderboard_activity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/bt_leaderboard"/>
+    <Button
+        android:id="@+id/bt_leaderboard_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/color_ternary"
+        android:text="@string/bt_leaderboard"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

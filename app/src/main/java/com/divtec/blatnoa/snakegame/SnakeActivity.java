@@ -198,7 +198,7 @@ public class SnakeActivity extends AppCompatActivity {
                     cell.setMaxHeight(cellSize);
 
                     // Alternate background between cells
-                    cell.setBackgroundColor(getColor(cellColor1 ? R.color.cell1 : R.color.cell2));
+                    cell.setBackgroundColor(getColor(cellColor1 ? R.color.color_secondary : R.color.color_ternary));
 
                     // Add the cell to the grid
                     grid.addView(cell);
