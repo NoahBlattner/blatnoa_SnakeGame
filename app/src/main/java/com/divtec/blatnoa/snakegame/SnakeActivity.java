@@ -15,8 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
-import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Controllers.ScoreManager;
-import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Models.Score;
+import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Controllers.RankingManager;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -69,8 +68,8 @@ public class SnakeActivity extends AppCompatActivity {
                 playerNameText.requestFocus();
             } else {
                 // Save to sqlite
-                ScoreManager scoreManager = new ScoreManager(this);
-                System.out.println(scoreManager.getScores());
+                RankingManager scoreManager = new RankingManager(this);
+                System.out.println(scoreManager.getAllRankings());
                 if (saveScore(playerNameText.getText().toString(),
                         Integer.parseInt(currentScoreText.getText().toString()))) { // If the score was saved
                     // Disable the button and set text to "Saved"
@@ -153,10 +152,10 @@ public class SnakeActivity extends AppCompatActivity {
      * @param score The score of the player
      */
     private boolean saveScore(String playerName, int score) {
-        ScoreManager scoreManager = new ScoreManager(this);
+        RankingManager scoreManager = new RankingManager(this);
 
-        if (scoreManager.getLowestScore().getScore() > score
-                && scoreManager.getScores().size() >= 10) { // If the score is lower than the 10th score
+        if (scoreManager.getLowestRanking().getScore() > score
+                && scoreManager.getAllRankings().size() >= 10) { // If the score is lower than the 10th score
             Toast.makeText(this, R.string.score_too_low, Toast.LENGTH_SHORT).show();
 
             // Do not save
@@ -164,7 +163,7 @@ public class SnakeActivity extends AppCompatActivity {
         }
 
         // Add the score to the database
-        if (!scoreManager.addScore(playerName, score)) { // If the score was not added
+        if (!scoreManager.addRanking(playerName, score)) { // If the score was not added
             // Show a toast to inform the user
             Toast.makeText(this, "Failed to save score", Toast.LENGTH_SHORT).show();
             return false;

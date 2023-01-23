@@ -9,33 +9,31 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.divtec.blatnoa.snakegame.R;
 
-public class RankingView extends LinearLayout {
+public class RankingView extends RecyclerView.ViewHolder {
 
     private TextView rankingTextView;
     private TextView nameTextView;
     private TextView scoreTextView;
     private TextView timeDateTextView;
 
-    boolean isTitle = false;
+    private boolean isTitle;
 
-    public RankingView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+    public RankingView(View view) {
+        super(view);
 
-        isTitle = attrs.getAttributeBooleanValue(R.styleable.RankingView_isTitle, false);
-
-        rankingTextView = findViewById(R.id.txt_ranking);
-        nameTextView = findViewById(R.id.txt_name);
-        scoreTextView = findViewById(R.id.txt_final_score);
-        timeDateTextView = findViewById(R.id.txt_date);
+        rankingTextView = view.findViewById(R.id.txt_ranking);
+        nameTextView = view.findViewById(R.id.txt_name);
+        scoreTextView = view.findViewById(R.id.txt_final_score);
+        timeDateTextView = view.findViewById(R.id.txt_date);
 
         initComponent();
     }
 
     private void initComponent() {
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.leaderboard_ranking, this);
 
         if (isTitle) {
             rankingTextView.setTypeface(null, Typeface.BOLD);
@@ -48,5 +46,21 @@ public class RankingView extends LinearLayout {
             scoreTextView.setText("Score");
             timeDateTextView.setText("Date");
         }
+    }
+
+    /**
+     * Set if the view is a title
+     * @param isTitle Whether the view is a title
+     */
+    public void setIsTitle(boolean isTitle) {
+        this.isTitle = isTitle;
+        initComponent();
+    }
+
+    public void setData(String ranking, String name, String score, String timeDate) {
+        rankingTextView.setText(ranking);
+        nameTextView.setText(name);
+        scoreTextView.setText(score);
+        timeDateTextView.setText(timeDate);
     }
 }
