@@ -1,10 +1,6 @@
 package com.divtec.blatnoa.snakegame.Leaderboard;
 
-import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Typeface;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +11,7 @@ import com.divtec.blatnoa.snakegame.R;
 
 public class RankingView extends RecyclerView.ViewHolder {
 
+    private LinearLayout lyt;
     private TextView rankingTextView;
     private TextView nameTextView;
     private TextView scoreTextView;
@@ -25,6 +22,7 @@ public class RankingView extends RecyclerView.ViewHolder {
     public RankingView(View view) {
         super(view);
 
+        lyt = view.findViewById(R.id.lyt);
         rankingTextView = view.findViewById(R.id.txt_ranking);
         nameTextView = view.findViewById(R.id.txt_name);
         scoreTextView = view.findViewById(R.id.txt_score);
@@ -41,7 +39,10 @@ public class RankingView extends RecyclerView.ViewHolder {
             scoreTextView.setTypeface(null, Typeface.BOLD);
             timeDateTextView.setTypeface(null, Typeface.BOLD);
 
-            setData("Ranking", "Name", "Score", "Date");
+            // Set the background image
+            lyt.setBackgroundResource(R.drawable.border_top_horizontal);
+
+            setData("Rank", "Name", "Score", "Date");
         }
     }
 
