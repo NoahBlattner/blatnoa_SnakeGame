@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.divtec.blatnoa.snakegame.Snake.Snake;
 import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Controllers.RankingManager;
-import com.divtec.blatnoa.snakegame.Snake.SnakeSQLite.Models.Ranking;
 import com.divtec.blatnoa.snakegame.Tick.TickManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -65,7 +64,7 @@ public class SnakeActivity extends AppCompatActivity {
         saveScoreButton.setOnClickListener(v -> {
             // If the player name is not too short
             if (playerNameText.getText().length() < 3) {
-                playerNameText.setError(getString(R.string.name_too_short));
+                playerNameText.setError(getString(R.string.edit_name_too_short));
                 playerNameText.requestFocus();
             } else {
                 // Save to sqlite
@@ -76,7 +75,7 @@ public class SnakeActivity extends AppCompatActivity {
                     // Disable the button and set text to "Saved"
                     saveScoreButton.setEnabled(false);
                     saveScoreButton.setAlpha(.5f);
-                    saveScoreButton.setText(R.string.score_saved);
+                    saveScoreButton.setText(R.string.bt_score_saved);
 
                     // Lock the text field
                     playerNameText.setEnabled(false);

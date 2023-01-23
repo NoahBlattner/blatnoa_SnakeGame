@@ -84,7 +84,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/final_score_text"
+                android:text="@string/txt_final_score"
                 android:textColor="@color/white"
                 android:textSize="22sp"/>
 
@@ -105,7 +105,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:startIconDrawable="@drawable/ic_baseline_person_outline_24"
-            android:hint="@string/txt_name">
+            android:hint="@string/edit_name_hint">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txt_player_name"

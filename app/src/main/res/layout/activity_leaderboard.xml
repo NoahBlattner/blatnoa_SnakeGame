@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="@dimen/main_spacing"
-        android:text="@string/leaderboard_title"
+        android:text="@string/txt_leaderboard_title"
         android:textSize="@dimen/title_text_size"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -35,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/leaderboard_empty"
+        android:text="@string/txt_leaderboard_empty"
         android:textSize="@dimen/subtitle_text_size"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

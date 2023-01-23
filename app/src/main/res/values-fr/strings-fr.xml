@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">SnakeGame</string>
+
+    <!-- Menu -->
+    <string name="bt_physics_test">Test de physiques</string>
+    <string name="bt_snake_game">Jeu de serpent</string>
+    <string name="bt_leaderboard">Classment de sepent</string>
+
+    <!-- Snake Game -->
+    <string name="score">Points:</string>
+    <!-- Game Over -->
+    <string name="txt_game_over">Perdu</string>
+    <string name="txt_final_score">Vos points final sont :</string>
+    <string name="edit_name_hint">Votre nom</string>
+    <string name="bt_save_score">Sauvegarder</string>
+    <string name="bt_score_saved">Sauvegardé !</string>
+    <string name="edit_name_too_short">Votre nom dois comporter au minimum 3 symboles !</string>
+    <string name="bt_restart">Reset</string>
+    <string name="bt_quit">Quitter</string>
+
+    <!-- Leaderboard -->
+    <string name="txt_leaderboard_title">Classement Serpent</string>
+    <string name="txt_leaderboard_empty">le classement est vide</string>
+    <!-- Leaderboard Menu -->
+    <string name="menu_clear_leaderboard">Vider le classement</string>
+    <!-- Leaderboard Dialog -->
+    <string name="dialog_title_clear_leaderboard">Vider le classement</string>
+    <string name="dialog_text_confirm">Etes vous sûr de vouloir supprimer le classement ?</string>
+    <string name="dialog_button_confirm">Oui</string>
+    <string name="dialog_button_cancel">Non</string>
+</resources>
