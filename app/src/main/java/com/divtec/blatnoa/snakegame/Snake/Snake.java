@@ -265,7 +265,6 @@ public class Snake implements Tickable {
         boolean hasEaten = false;
         if (isFoodCell(newX, newY)) { // If new position is food
             hasEaten = true;
-            onEatFood();
         }
 
         if (bodyCells.size() > 0 || hasEaten) { // If has body or has eaten
@@ -276,6 +275,10 @@ public class Snake implements Tickable {
         if (!hasEaten && bodyCells.size() > 0) { // If snake hasn't eaten and has body
             // Remove last body cell
             bodyCells.remove(0);
+        }
+
+        if (hasEaten) {
+            onEatFood();
         }
 
         if (!positionValid(newX, newY)) { // If new position isn't free

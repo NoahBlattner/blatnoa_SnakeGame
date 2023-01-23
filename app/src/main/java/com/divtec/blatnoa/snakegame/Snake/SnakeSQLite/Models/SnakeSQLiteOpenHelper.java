@@ -28,14 +28,6 @@ public class SnakeSQLiteOpenHelper extends SQLiteOpenHelper {
      * @return True if the score was added, false otherwise
      */
     public boolean addScore(String player, int score) {
-        int lowestScore = getLowestScore();
-
-        // If the row count is 10
-        if (getRowCount() >= 10) {
-            // Delete the lowest score
-            deleteLowestScore();
-        }
-
         try {
             // Insert the new score
             getWritableDatabase().execSQL("INSERT INTO tb_snakeScores(player, score, timeDate)" +
