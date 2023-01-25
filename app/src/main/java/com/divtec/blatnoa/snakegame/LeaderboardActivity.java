@@ -79,6 +79,11 @@ public class LeaderboardActivity extends AppCompatActivity {
                         .setTitle(R.string.dialog_title_clear_leaderboard)
                         .setMessage(R.string.dialog_text_confirm)
                         .setPositiveButton(R.string.dialog_button_confirm, (dialog, which) -> {
+                            // Clear the leaderboard
+                            RankingManager rankingManager = new RankingManager(this);
+                            rankingManager.clearScores();
+
+                            // Reload the list
                             initList();
                         })
                         .setNegativeButton(R.string.dialog_button_cancel, null)
